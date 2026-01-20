@@ -3,6 +3,7 @@ import Layout from './components/layout/Layout';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
 import Dashboard from './pages/Dashboard';
+import CourseRegistration from './pages/CourseRegistration';
 
 // Temporary placeholder component for other pages
 const ComingSoon = ({ pageName }) => (
@@ -48,9 +49,9 @@ function App() {
           </ProtectedRoute>
         } />
         <Route path="/course-registration" element={
-          <ProtectedRoute>
-            <Layout><ComingSoon pageName="Course Registration" /></Layout>
-          </ProtectedRoute>
+        <ProtectedRoute>
+          <Layout><CourseRegistration /></Layout>
+        </ProtectedRoute>
         } />
         <Route path="/my-courses" element={
           <ProtectedRoute>
