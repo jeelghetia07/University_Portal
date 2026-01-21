@@ -1,7 +1,15 @@
-import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { Bell, Search, Menu, User, Settings, LogOut, ChevronDown } from 'lucide-react';
-import { currentUser } from '../../data/mockData';
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import {
+  Bell,
+  Search,
+  Menu,
+  User,
+  Settings,
+  LogOut,
+  ChevronDown,
+} from "lucide-react";
+import { currentUser } from "../../data/mockData";
 
 const Navbar = ({ toggleSidebar }) => {
   const [showNotifications, setShowNotifications] = useState(false);
@@ -9,17 +17,27 @@ const Navbar = ({ toggleSidebar }) => {
   const navigate = useNavigate();
 
   const notifications = [
-    { id: 1, title: 'New assignment posted', time: '2 hours ago', unread: true },
-    { id: 2, title: 'Exam schedule updated', time: '5 hours ago', unread: true },
-    { id: 3, title: 'Fee payment reminder', time: '1 day ago', unread: false }
+    {
+      id: 1,
+      title: "New assignment posted",
+      time: "2 hours ago",
+      unread: true,
+    },
+    {
+      id: 2,
+      title: "Exam schedule updated",
+      time: "5 hours ago",
+      unread: true,
+    },
+    { id: 3, title: "Fee payment reminder", time: "1 day ago", unread: false },
   ];
 
-  const unreadCount = notifications.filter(n => n.unread).length;
+  const unreadCount = notifications.filter((n) => n.unread).length;
 
   const handleLogout = () => {
     // Clear any stored data
     localStorage.clear();
-    navigate('/');
+    navigate("/");
   };
 
   return (
@@ -65,14 +83,16 @@ const Navbar = ({ toggleSidebar }) => {
               {showNotifications && (
                 <div className="absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-xl border border-slate-200 py-2 animate-fadeIn">
                   <div className="px-4 py-2 border-b border-slate-200">
-                    <h3 className="text-sm font-semibold text-slate-900">Notifications</h3>
+                    <h3 className="text-sm font-semibold text-slate-900">
+                      Notifications
+                    </h3>
                   </div>
                   <div className="max-h-64 overflow-y-auto">
-                    {notifications.map(notif => (
+                    {notifications.map((notif) => (
                       <div
                         key={notif.id}
                         className={`px-4 py-3 hover:bg-slate-50 cursor-pointer transition-colors ${
-                          notif.unread ? 'bg-indigo-50/50' : ''
+                          notif.unread ? "bg-indigo-50/50" : ""
                         }`}
                       >
                         <div className="flex items-start space-x-3">
@@ -80,8 +100,12 @@ const Navbar = ({ toggleSidebar }) => {
                             <div className="w-2 h-2 bg-indigo-600 rounded-full mt-1.5"></div>
                           )}
                           <div className="flex-1">
-                            <p className="text-sm text-slate-900 font-medium">{notif.title}</p>
-                            <p className="text-xs text-slate-500 mt-0.5">{notif.time}</p>
+                            <p className="text-sm text-slate-900 font-medium">
+                              {notif.title}
+                            </p>
+                            <p className="text-xs text-slate-500 mt-0.5">
+                              {notif.time}
+                            </p>
                           </div>
                         </div>
                       </div>
@@ -112,8 +136,13 @@ const Navbar = ({ toggleSidebar }) => {
                   className="w-8 h-8 rounded-full ring-2 ring-slate-200 group-hover:ring-indigo-500 transition-all"
                 />
                 <div className="hidden md:block text-left">
-                  <p className="text-sm font-semibold text-slate-900">{currentUser.name}</p>
-                  <p className="text-xs text-slate-500">{currentUser.id}</p>
+                  <p className="text-sm font-semibold text-slate-900">
+                    {currentUser.name}
+                  </p>
+                  <p className="text-xs text-slate-500">
+                    {localStorage.getItem("userDepartment") ||
+                      currentUser.department}
+                  </p>
                 </div>
                 <ChevronDown className="w-4 h-4 text-slate-400 group-hover:text-slate-600 transition-colors" />
               </button>
@@ -122,10 +151,14 @@ const Navbar = ({ toggleSidebar }) => {
               {showProfileMenu && (
                 <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-xl border border-slate-200 py-2 animate-fadeIn">
                   <div className="px-4 py-3 border-b border-slate-200">
-                    <p className="text-sm font-semibold text-slate-900">{currentUser.name}</p>
-                    <p className="text-xs text-slate-500">{currentUser.email}</p>
+                    <p className="text-sm font-semibold text-slate-900">
+                      {currentUser.name}
+                    </p>
+                    <p className="text-xs text-slate-500">
+                      {currentUser.email}
+                    </p>
                   </div>
-                  
+
                   <div className="py-1">
                     <Link
                       to="/profile"

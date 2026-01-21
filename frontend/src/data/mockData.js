@@ -1,5 +1,22 @@
 // Mock data for the entire application
 
+// Utility function to get department from roll number
+export const getDepartmentFromRollNumber = (rollNumber) => {
+  if (!rollNumber || rollNumber.length < 5) return 'Computer Science';
+  
+  const deptCode = rollNumber.substring(3, 5).toUpperCase();
+  const deptMap = {
+    'CP': 'Computer Science',
+    'IT': 'Information Technology',
+    'EC': 'Electronics & Communication',
+    'CV': 'Civil Engineering',
+    'ME': 'Mechanical Engineering',
+    'EE': 'Electrical Engineering'
+  };
+  
+  return deptMap[deptCode] || 'Computer Science';
+};
+
 export const currentUser = {
   id: "STU2024001",
   name: "Rahul Sharma",
