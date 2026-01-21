@@ -12,6 +12,10 @@ import {
 import { currentUser, announcements, enrolledCourses, timetable } from '../data/mockData';
 
 const Dashboard = () => {
+  // Get user's department from localStorage (set during login)
+  const userDepartment = localStorage.getItem('userDepartment') || currentUser.department;
+  const userName = localStorage.getItem('userName') || currentUser.name;
+  
   // Get today's classes
   const today = new Date().toLocaleDateString('en-US', { weekday: 'long' });
   const todayClasses = timetable.find(day => day.day === today)?.classes || [];
@@ -23,7 +27,7 @@ const Dashboard = () => {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl md:text-4xl font-bold mb-2">
-              Welcome back, {currentUser.name.split(' ')[0]}! 👋
+              Welcome back, {userName.split(' ')[0]}! 👋
             </h1>
             <p className="text-indigo-100 text-lg">
               Here's what's happening with your courses today
@@ -81,7 +85,7 @@ const Dashboard = () => {
           <p className="text-sm text-slate-600 mt-1">Current CGPA</p>
         </div>
 
-        {/* Semester */}
+        {/* Semester & Department */}
         <div className="bg-white rounded-xl p-6 shadow-sm border border-slate-200 hover:shadow-md transition-all">
           <div className="flex items-center justify-between mb-4">
             <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
@@ -92,7 +96,7 @@ const Dashboard = () => {
             </span>
           </div>
           <h3 className="text-2xl font-bold text-slate-900">Semester {currentUser.semester}</h3>
-          <p className="text-sm text-slate-600 mt-1">{currentUser.department}</p>
+          <p className="text-sm text-slate-600 mt-1">{userDepartment}</p>
         </div>
       </div>
 
