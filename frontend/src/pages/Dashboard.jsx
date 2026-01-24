@@ -1,24 +1,30 @@
-import { Link } from 'react-router-dom';
-import { 
-  BookOpen, 
-  TrendingUp, 
-  Calendar, 
+import { Link } from "react-router-dom";
+import {
+  BookOpen,
+  TrendingUp,
+  Calendar,
   Bell,
   Award,
-  Users,
   Clock,
-  ArrowRight
-} from 'lucide-react';
-import { currentUser, announcements, enrolledCourses, timetable } from '../data/mockData';
+  ArrowRight,
+} from "lucide-react";
+import {
+  currentUser,
+  announcements,
+  enrolledCourses,
+  timetable,
+} from "../data/mockData";
 
 const Dashboard = () => {
   // Get user's department from localStorage (set during login)
-  const userDepartment = localStorage.getItem('userDepartment') || currentUser.department;
-  const userName = localStorage.getItem('userName') || currentUser.name;
-  
+  const userDepartment =
+    localStorage.getItem("userDepartment") || currentUser.department;
+  const userName = localStorage.getItem("userName") || currentUser.name;
+
   // Get today's classes
-  const today = new Date().toLocaleDateString('en-US', { weekday: 'long' });
-  const todayClasses = timetable.find(day => day.day === today)?.classes || [];
+  const today = new Date().toLocaleDateString("en-US", { weekday: "long" });
+  const todayClasses =
+    timetable.find((day) => day.day === today)?.classes || [];
 
   return (
     <div className="space-y-6">
@@ -27,7 +33,7 @@ const Dashboard = () => {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl md:text-4xl font-bold mb-2">
-              Welcome back, {userName.split(' ')[0]}! 👋
+              Welcome back, {userName.split(" ")[0]}! 👋
             </h1>
             <p className="text-indigo-100 text-lg">
               Here's what's happening with your courses today
@@ -53,7 +59,9 @@ const Dashboard = () => {
               Active
             </span>
           </div>
-          <h3 className="text-2xl font-bold text-slate-900">{enrolledCourses.length}/6</h3>
+          <h3 className="text-2xl font-bold text-slate-900">
+            {enrolledCourses.length}/6
+          </h3>
           <p className="text-sm text-slate-600 mt-1">Enrolled Courses</p>
         </div>
 
@@ -67,7 +75,9 @@ const Dashboard = () => {
               Good
             </span>
           </div>
-          <h3 className="text-2xl font-bold text-slate-900">{currentUser.attendance}%</h3>
+          <h3 className="text-2xl font-bold text-slate-900">
+            {currentUser.attendance}%
+          </h3>
           <p className="text-sm text-slate-600 mt-1">Overall Attendance</p>
         </div>
 
@@ -81,7 +91,9 @@ const Dashboard = () => {
               Excellent
             </span>
           </div>
-          <h3 className="text-2xl font-bold text-slate-900">{currentUser.cgpa}/10</h3>
+          <h3 className="text-2xl font-bold text-slate-900">
+            {currentUser.cgpa}/10
+          </h3>
           <p className="text-sm text-slate-600 mt-1">Current CGPA</p>
         </div>
 
@@ -95,7 +107,9 @@ const Dashboard = () => {
               Current
             </span>
           </div>
-          <h3 className="text-2xl font-bold text-slate-900">Semester {currentUser.semester}</h3>
+          <h3 className="text-2xl font-bold text-slate-900">
+            Semester {currentUser.semester}
+          </h3>
           <p className="text-sm text-slate-600 mt-1">{userDepartment}</p>
         </div>
       </div>
@@ -110,11 +124,13 @@ const Dashboard = () => {
                 <Clock className="w-5 h-5 text-indigo-600" />
               </div>
               <div>
-                <h2 className="text-xl font-bold text-slate-900">Today's Schedule</h2>
+                <h2 className="text-xl font-bold text-slate-900">
+                  Today's Schedule
+                </h2>
                 <p className="text-sm text-slate-600">{today}</p>
               </div>
             </div>
-            <Link 
+            <Link
               to="/timetable"
               className="text-sm text-indigo-600 hover:text-indigo-700 font-medium flex items-center space-x-1"
             >
@@ -126,17 +142,19 @@ const Dashboard = () => {
           <div className="space-y-3">
             {todayClasses.length > 0 ? (
               todayClasses.map((cls, index) => (
-                <div 
+                <div
                   key={index}
                   className="flex items-center space-x-4 p-4 bg-slate-50 rounded-lg hover:bg-slate-100 transition-colors"
                 >
                   <div className="flex-shrink-0 w-16 text-center">
                     <p className="text-xs font-semibold text-indigo-600">
-                      {cls.time.split(' - ')[0]}
+                      {cls.time.split(" - ")[0]}
                     </p>
                   </div>
                   <div className="flex-1">
-                    <h3 className="font-semibold text-slate-900">{cls.course}</h3>
+                    <h3 className="font-semibold text-slate-900">
+                      {cls.course}
+                    </h3>
                     <p className="text-sm text-slate-600">{cls.faculty}</p>
                   </div>
                   <div className="flex-shrink-0">
@@ -162,9 +180,11 @@ const Dashboard = () => {
               <div className="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center">
                 <Bell className="w-5 h-5 text-orange-600" />
               </div>
-              <h2 className="text-xl font-bold text-slate-900">Announcements</h2>
+              <h2 className="text-xl font-bold text-slate-900">
+                Announcements
+              </h2>
             </div>
-            <Link 
+            <Link
               to="/announcements"
               className="text-sm text-indigo-600 hover:text-indigo-700 font-medium"
             >
@@ -174,16 +194,20 @@ const Dashboard = () => {
 
           <div className="space-y-3">
             {announcements.slice(0, 4).map((announcement) => (
-              <div 
+              <div
                 key={announcement.id}
                 className="p-3 bg-slate-50 rounded-lg hover:bg-slate-100 transition-colors cursor-pointer"
               >
                 <div className="flex items-start space-x-3">
-                  <div className={`w-2 h-2 rounded-full mt-2 flex-shrink-0 ${
-                    announcement.priority === 'high' ? 'bg-red-500' :
-                    announcement.priority === 'medium' ? 'bg-orange-500' :
-                    'bg-green-500'
-                  }`} />
+                  <div
+                    className={`w-2 h-2 rounded-full mt-2 flex-shrink-0 ${
+                      announcement.priority === "high"
+                        ? "bg-red-500"
+                        : announcement.priority === "medium"
+                          ? "bg-orange-500"
+                          : "bg-green-500"
+                    }`}
+                  />
                   <div className="flex-1">
                     <h3 className="text-sm font-semibold text-slate-900 mb-1">
                       {announcement.title}
@@ -192,9 +216,9 @@ const Dashboard = () => {
                       {announcement.description}
                     </p>
                     <p className="text-xs text-slate-500 mt-1">
-                      {new Date(announcement.date).toLocaleDateString('en-US', { 
-                        month: 'short', 
-                        day: 'numeric' 
+                      {new Date(announcement.date).toLocaleDateString("en-US", {
+                        month: "short",
+                        day: "numeric",
                       })}
                     </p>
                   </div>
@@ -216,17 +240,21 @@ const Dashboard = () => {
             <div className="w-12 h-12 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-lg flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
               <BookOpen className="w-6 h-6 text-white" />
             </div>
-            <span className="text-sm font-semibold text-slate-900">Register Courses</span>
+            <span className="text-sm font-semibold text-slate-900">
+              Register Courses
+            </span>
           </Link>
 
           <Link
-            to="/attendance"
+            to="/timetable"
             className="flex flex-col items-center p-4 bg-gradient-to-br from-green-50 to-emerald-50 rounded-lg hover:shadow-md transition-all group"
           >
             <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-600 rounded-lg flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
-              <TrendingUp className="w-6 h-6 text-white" />
+              <Calendar className="w-6 h-6 text-white" />
             </div>
-            <span className="text-sm font-semibold text-slate-900">View Attendance</span>
+            <span className="text-sm font-semibold text-slate-900">
+              View Timetable
+            </span>
           </Link>
 
           <Link
@@ -236,17 +264,21 @@ const Dashboard = () => {
             <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-600 rounded-lg flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
               <Award className="w-6 h-6 text-white" />
             </div>
-            <span className="text-sm font-semibold text-slate-900">Check Grades</span>
+            <span className="text-sm font-semibold text-slate-900">
+              Check Grades
+            </span>
           </Link>
 
           <Link
-            to="/faculty"
+            to="/library"
             className="flex flex-col items-center p-4 bg-gradient-to-br from-orange-50 to-red-50 rounded-lg hover:shadow-md transition-all group"
           >
             <div className="w-12 h-12 bg-gradient-to-br from-orange-500 to-red-600 rounded-lg flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
-              <Users className="w-6 h-6 text-white" />
+              <BookOpen className="w-6 h-6 text-white" />
             </div>
-            <span className="text-sm font-semibold text-slate-900">Faculty Directory</span>
+            <span className="text-sm font-semibold text-slate-900">
+              Library
+            </span>
           </Link>
         </div>
       </div>

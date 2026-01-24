@@ -21,19 +21,6 @@ import Announcements from "./pages/Announcements";
 import Settings from "./pages/Settings";
 import Support from "./pages/Support";
 
-// Temporary placeholder component for other pages
-const ComingSoon = ({ pageName }) => (
-  <div className="flex items-center justify-center min-h-[60vh]">
-    <div className="text-center">
-      <div className="w-20 h-20 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-4">
-        <span className="text-3xl">🚧</span>
-      </div>
-      <h2 className="text-2xl font-bold text-slate-900 mb-2">{pageName}</h2>
-      <p className="text-slate-600">This page is coming soon!</p>
-    </div>
-  </div>
-);
-
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
   const isAuthenticated = localStorage.getItem("authToken");
@@ -53,7 +40,7 @@ function App() {
         <Route path="/" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
 
-        {/* Protected Routes - Require Login */}
+        {/* Protected Routes */}
         <Route
           path="/dashboard"
           element={
@@ -105,16 +92,6 @@ function App() {
           }
         />
         <Route
-          path="/attendance"
-          element={
-            <ProtectedRoute>
-              <Layout>
-                <ComingSoon pageName="Attendance" />
-              </Layout>
-            </ProtectedRoute>
-          }
-        />
-        <Route
           path="/grades"
           element={
             <ProtectedRoute>
@@ -140,16 +117,6 @@ function App() {
             <ProtectedRoute>
               <Layout>
                 <Announcements />
-              </Layout>
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/faculty"
-          element={
-            <ProtectedRoute>
-              <Layout>
-                <ComingSoon pageName="Faculty Directory" />
               </Layout>
             </ProtectedRoute>
           }
