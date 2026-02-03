@@ -41,12 +41,7 @@ const Signup = () => {
     setError("");
 
     // Validation
-    if (
-      !formData.name ||
-      !formData.email ||
-      !formData.password ||
-      !formData.confirmPassword
-    ) {
+    if (!formData.name || !formData.email || !formData.password || !formData.confirmPassword) {
       setError("Please fill in all required fields");
       return;
     }
