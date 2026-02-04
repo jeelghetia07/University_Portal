@@ -31,6 +31,41 @@ const Login = () => {
     }
   }, []);
 
+  // Email validation function
+  const validateEmail = (email) => {
+    // Check if email ends with @university.edu
+    if (!email.endsWith('@university.edu')) {
+      return { valid: false, message: 'Please use your university email (@university.edu)' };
+    }
+
+    // Extract roll number (part before @)
+    const rollNumber = email.split('@')[0].toUpperCase();
+
+    // Check if roll number has valid format (e.g., 24BCP001)
+    // Format: YearBDeptCodeNumber
+    const rollPattern = /^\d{2}B[A-Z]{2}\d{3,}$/;
+    
+    if (!rollPattern.test(rollNumber)) {
+      return { 
+        valid: false, 
+        message: 'Invalid roll number format. Use format like 24BCP001@university.edu' 
+      };
+    }
+
+    // Valid department codes
+    const validDeptCodes = ['CP', 'IT', 'EC', 'CV', 'ME', 'EE'];
+    const deptCode = rollNumber.substring(3, 5).toUpperCase();
+
+    if (!validDeptCodes.includes(deptCode)) {
+      return { 
+        valid: false, 
+        message: `Invalid department code "${deptCode}". Valid codes: CP, IT, EC, CV, ME, EE` 
+      };
+    }
+
+    return { valid: true, message: '' };
+  };
+
   const handleLogin = (e) => {
     e.preventDefault();
     setError('');
@@ -43,39 +78,47 @@ const Login = () => {
       return;
     }
 
+    // Validate email format
+    const emailValidation = validateEmail(email);
+    if (!emailValidation.valid) {
+      setError(emailValidation.message);
+      setLoading(false);
+      return;
+    }
+
     setTimeout(() => {
-  // For demo: Use email as roll number if it contains roll number pattern
-  // In real app, backend will return user details
-  const rollNumber = email.split('@')[0].toUpperCase(); // Extract roll from email
-  
-  // Import function at top of file
-  const getDepartmentFromRollNumber = (rollNumber) => {
-    if (!rollNumber || rollNumber.length < 5) return 'Computer Science';
-    
-    const deptCode = rollNumber.substring(3, 5).toUpperCase();
-    const deptMap = {
-      'CP': 'Computer Science',
-      'IT': 'Information Technology',
-      'EC': 'Electronics & Communication',
-      'CV': 'Civil Engineering',
-      'ME': 'Mechanical Engineering',
-      'EE': 'Electrical Engineering'
-    };
-    
-    return deptMap[deptCode] || 'Computer Science';
-  };
-  
-  const department = getDepartmentFromRollNumber(rollNumber);
-  
-  // Store auth data
-  localStorage.setItem('authToken', 'dummy-token-12345');
-  localStorage.setItem('userEmail', email);
-  localStorage.setItem('userRollNumber', rollNumber);
-  localStorage.setItem('userDepartment', department);
-  
-  setLoading(false);
-  navigate('/dashboard');
-}, 1000);
+      // Extract roll number from email
+      const rollNumber = email.split('@')[0].toUpperCase();
+      
+      // Get department from roll number
+      const getDepartmentFromRollNumber = (rollNumber) => {
+        if (!rollNumber || rollNumber.length < 5) return 'Computer Science';
+        
+        const deptCode = rollNumber.substring(3, 5).toUpperCase();
+        const deptMap = {
+          'CP': 'Computer Science',
+          'IT': 'Information Technology',
+          'EC': 'Electronics & Communication',
+          'CV': 'Civil Engineering',
+          'ME': 'Mechanical Engineering',
+          'EE': 'Electrical Engineering'
+        };
+        
+        return deptMap[deptCode] || 'Computer Science';
+      };
+      
+      const department = getDepartmentFromRollNumber(rollNumber);
+      
+      // Store auth data
+      localStorage.setItem('authToken', 'dummy-token-12345');
+      localStorage.setItem('userEmail', email);
+      localStorage.setItem('userRollNumber', rollNumber);
+      localStorage.setItem('userDepartment', department);
+      localStorage.setItem('userName', rollNumber); // You can improve this later
+      
+      setLoading(false);
+      navigate('/dashboard');
+    }, 1000);
   };
 
   const handleCreateAccount = () => {
@@ -136,7 +179,7 @@ const Login = () => {
             {/* Email Input */}
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-2">
-                Email Address
+                University Email
               </label>
               <div className="relative">
                 <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400" />
@@ -144,7 +187,7 @@ const Login = () => {
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="student@university.edu"
+                  placeholder="24BCP001@university.edu"
                   className="w-full pl-10 pr-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
                 />
               </div>
@@ -207,10 +250,16 @@ const Login = () => {
             </button>
           </form>
 
-          {/* Demo Credentials Info */}
+          {/* Valid Email Format Info */}
           <div className="mt-4 p-3 bg-indigo-50 border border-indigo-200 rounded-lg">
-            <p className="text-xs text-indigo-700 text-center">
-              <strong>Demo:</strong> Use any email and password to login
+            <p className="text-xs text-indigo-700">
+              <strong>Email Format:</strong> Use your university email
+            </p>
+            <p className="text-xs text-indigo-600 mt-1">
+              Example: 24BCP001@university.edu
+            </p>
+            <p className="text-xs text-indigo-600 mt-1">
+              Valid Departments: CP, IT, EC, CV, ME, EE
             </p>
           </div>
 
