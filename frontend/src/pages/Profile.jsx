@@ -1,10 +1,13 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { User, Mail, Phone, MapPin, Calendar, Award, BookOpen, Edit2, Save, X, Lock, Camera } from 'lucide-react';
-import { currentUser } from '../data/mockData';
+import { currentUser, gradesData } from '../data/mockData';
 
 const Profile = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [showPasswordModal, setShowPasswordModal] = useState(false);
+  const [profilePicture, setProfilePicture] = useState(currentUser.profilePic);
+  const fileInputRef = useRef(null);
+  
   const [profileData, setProfileData] = useState({
     name: currentUser.name,
     email: currentUser.email,
@@ -23,6 +26,106 @@ const Profile = () => {
     confirmPassword: ''
   });
 
+  // Calculate actual CGPA from grades data
+  const calculateCGPA = () => {
+    // Get SGPA from previous semesters
+    const previousSemesters = gradesData.previousSemesters || [];
+    
+    // Calculate current semester SGPA
+    const currentSemCourses = gradesData.currentSemester || [];
+    let totalGradePoints = 0;
+    let totalCredits = 0;
+    
+    currentSemCourses.forEach(course => {
+      const gradePoint = getGradePoint(course.grade);
+      totalGradePoints += gradePoint * course.credits;
+      totalCredits += course.credits;
+    });
+    
+    const currentSGPA = totalCredits > 0 ? totalGradePoints / totalCredits : 0;
+    
+    // Calculate CGPA: (sum of all SGPAs) / (total semesters)
+    const allSGPAs = [...previousSemesters.map(sem => sem.sgpa), currentSGPA];
+    const cgpa = allSGPAs.reduce((sum, sgpa) => sum + sgpa, 0) / allSGPAs.length;
+    
+    return cgpa.toFixed(2);
+  };
+
+  // Helper function to convert grade to grade point
+  const getGradePoint = (grade) => {
+    const gradeMap = {
+      'A+': 10, 'A': 9, 'B+': 8, 'B': 7, 'C+': 6, 'C': 5, 'D': 4, 'F': 0
+    };
+    return gradeMap[grade] || 0;
+  };
+
+  // Handle profile picture upload
+  const handleProfilePictureClick = () => {
+    fileInputRef.current.click();
+  };
+
+  const handleProfilePictureChange = (e) => {
+    const file = e.target.files[0];
+    
+    if (file) {
+      // Validate file type
+      const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+      if (!validTypes.includes(file.type)) {
+        alert('Please select a valid image file (JPEG, PNG, GIF, or WebP)');
+        return;
+      }
+
+      // Validate file size (max 5MB)
+      const maxSize = 5 * 1024 * 1024; // 5MB in bytes
+      if (file.size > maxSize) {
+        alert('File size must be less than 5MB');
+        return;
+      }
+
+      // Create a preview
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setProfilePicture(reader.result);
+        
+        // In a real app, you would upload to server here:
+        // uploadProfilePicture(file);
+        
+        console.log('Profile picture selected:', file.name);
+        alert('Profile picture updated! (In production, this would be uploaded to the server)');
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  // In real implementation, this function would upload to backend
+  const uploadProfilePicture = async (file) => {
+    // Example API call:
+    /*
+    const formData = new FormData();
+    formData.append('profilePicture', file);
+    formData.append('studentID', profileData.studentID);
+    
+    try {
+      const response = await fetch('/api/upload-profile-picture', {
+        method: 'POST',
+        body: formData,
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+        }
+      });
+      
+      const data = await response.json();
+      if (data.success) {
+        setProfilePicture(data.imageUrl); // URL from server
+        alert('Profile picture updated successfully!');
+      }
+    } catch (error) {
+      console.error('Upload failed:', error);
+      alert('Failed to upload profile picture');
+    }
+    */
+  };
+
   const handleInputChange = (e) => {
     setProfileData({
       ...profileData,
@@ -38,8 +141,35 @@ const Profile = () => {
   };
 
   const handleSave = () => {
-    // Backend API call will go here
-    console.log('Saving profile:', profileData);
+    // In real app: API call to update profile
+    /*
+    const updateData = {
+      phone: profileData.phone,
+      address: profileData.address
+      // Note: name and email are NOT included (frozen fields)
+    };
+    
+    fetch('/api/update-profile', {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+      },
+      body: JSON.stringify(updateData)
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        alert('Profile updated successfully!');
+        setIsEditing(false);
+      }
+    });
+    */
+    
+    console.log('Saving profile:', {
+      phone: profileData.phone,
+      address: profileData.address
+    });
     setIsEditing(false);
     alert('Profile updated successfully!');
   };
@@ -73,7 +203,28 @@ const Profile = () => {
       return;
     }
 
-    // Backend API call will go here
+    // In real app: API call to change password
+    /*
+    fetch('/api/change-password', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+      },
+      body: JSON.stringify({
+        currentPassword: passwordData.currentPassword,
+        newPassword: passwordData.newPassword
+      })
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        alert('Password changed successfully!');
+        setShowPasswordModal(false);
+      }
+    });
+    */
+    
     console.log('Changing password...');
     alert('Password changed successfully!');
     setShowPasswordModal(false);
@@ -83,6 +234,9 @@ const Profile = () => {
       confirmPassword: ''
     });
   };
+
+  // Get calculated CGPA
+  const actualCGPA = calculateCGPA();
 
   return (
     <div className="space-y-6">
@@ -104,11 +258,23 @@ const Profile = () => {
             <div className="flex items-end space-x-4">
               <div className="relative">
                 <img
-                  src={currentUser.profilePic}
+                  src={profilePicture}
                   alt={profileData.name}
-                  className="w-32 h-32 rounded-full border-4 border-white shadow-lg"
+                  className="w-32 h-32 rounded-full border-4 border-white shadow-lg object-cover"
                 />
-                <button className="absolute bottom-0 right-0 w-10 h-10 bg-indigo-600 rounded-full flex items-center justify-center text-white hover:bg-indigo-700 transition-all shadow-lg">
+                {/* Hidden file input */}
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/jpeg,image/jpg,image/png,image/gif,image/webp"
+                  onChange={handleProfilePictureChange}
+                  className="hidden"
+                />
+                <button
+                  onClick={handleProfilePictureClick}
+                  className="absolute bottom-0 right-0 w-10 h-10 bg-indigo-600 rounded-full flex items-center justify-center text-white hover:bg-indigo-700 transition-all shadow-lg"
+                  title="Upload profile picture"
+                >
                   <Camera className="w-5 h-5" />
                 </button>
               </div>
@@ -164,10 +330,10 @@ const Profile = () => {
             <div className="space-y-4">
               <h3 className="text-lg font-semibold text-slate-900 mb-4">Personal Information</h3>
               
-              {/* Full Name */}
+              {/* Full Name - FROZEN */}
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-2">
-                  Full Name
+                  Full Name <span className="text-xs text-slate-500">(Cannot be changed)</span>
                 </label>
                 <div className="relative">
                   <User className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400" />
@@ -175,21 +341,16 @@ const Profile = () => {
                     type="text"
                     name="name"
                     value={profileData.name}
-                    onChange={handleInputChange}
-                    disabled={!isEditing}
-                    className={`w-full pl-10 pr-4 py-3 border rounded-lg ${
-                      isEditing
-                        ? 'border-slate-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500'
-                        : 'border-slate-200 bg-slate-50 text-slate-600'
-                    } outline-none transition-all`}
+                    disabled
+                    className="w-full pl-10 pr-4 py-3 border border-slate-200 rounded-lg bg-slate-50 text-slate-600 outline-none cursor-not-allowed"
                   />
                 </div>
               </div>
 
-              {/* Email */}
+              {/* Email - FROZEN */}
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-2">
-                  Email Address
+                  Email Address <span className="text-xs text-slate-500">(Cannot be changed)</span>
                 </label>
                 <div className="relative">
                   <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400" />
@@ -197,18 +358,13 @@ const Profile = () => {
                     type="email"
                     name="email"
                     value={profileData.email}
-                    onChange={handleInputChange}
-                    disabled={!isEditing}
-                    className={`w-full pl-10 pr-4 py-3 border rounded-lg ${
-                      isEditing
-                        ? 'border-slate-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500'
-                        : 'border-slate-200 bg-slate-50 text-slate-600'
-                    } outline-none transition-all`}
+                    disabled
+                    className="w-full pl-10 pr-4 py-3 border border-slate-200 rounded-lg bg-slate-50 text-slate-600 outline-none cursor-not-allowed"
                   />
                 </div>
               </div>
 
-              {/* Phone */}
+              {/* Phone - EDITABLE */}
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-2">
                   Phone Number
@@ -230,7 +386,7 @@ const Profile = () => {
                 </div>
               </div>
 
-              {/* Address */}
+              {/* Address - EDITABLE */}
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-2">
                   Address
@@ -321,20 +477,23 @@ const Profile = () => {
                 </div>
               </div>
 
-              {/* CGPA */}
+              {/* CGPA - Calculated from grades */}
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-2">
-                  Current CGPA
+                  Current CGPA <span className="text-xs text-slate-500">(Auto-calculated)</span>
                 </label>
                 <div className="relative">
                   <Award className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400" />
                   <input
                     type="text"
-                    value={`${profileData.cgpa} / 10`}
+                    value={`${actualCGPA} / 10`}
                     disabled
                     className="w-full pl-10 pr-4 py-3 border border-slate-200 rounded-lg bg-slate-50 text-slate-600 outline-none"
                   />
                 </div>
+                <p className="text-xs text-slate-500 mt-1">
+                  Calculated as: (Sum of all semester SGPAs) / (Total semesters)
+                </p>
               </div>
             </div>
           </div>
