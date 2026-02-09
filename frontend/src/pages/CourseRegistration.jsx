@@ -1,16 +1,15 @@
 import { useState } from 'react';
-import { Search, BookOpen, Users, Clock, MapPin, Filter, CheckCircle, AlertCircle, X, User, Mail, Hash, UserCircle } from 'lucide-react';
+import { Search, BookOpen, Users, Clock, MapPin, CheckCircle, AlertCircle, X, User, Mail, Hash, UserCircle, Send } from 'lucide-react';
 import { availableCourses, enrolledCourses as initialEnrolled, currentUser } from '../data/mockData';
 
 const CourseRegistration = () => {
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedDepartment, setSelectedDepartment] = useState('All');
-  const [selectedSemester, setSelectedSemester] = useState('All');
   const [enrolledCourses, setEnrolledCourses] = useState(initialEnrolled);
   const [selectedCourse, setSelectedCourse] = useState(null);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [showRegistrationModal, setShowRegistrationModal] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [showDropRequestModal, setShowDropRequestModal] = useState(false);
   const [notification, setNotification] = useState({ show: false, type: '', message: '' });
   
   // Registration Form Data
@@ -21,19 +20,25 @@ const CourseRegistration = () => {
     gender: ''
   });
 
-  // Get unique departments and semesters
-  const departments = ['All', ...new Set(availableCourses.map(c => c.department))];
-  const semesters = ['All', ...new Set(availableCourses.map(c => c.semester))];
+  // Drop Request Form Data
+  const [dropRequestData, setDropRequestData] = useState({
+    courseToDropName: '',
+    courseToDropCode: '',
+    reason: '',
+    facultyEmail: ''
+  });
 
-  // Filter courses
-  const filteredCourses = availableCourses.filter(course => {
+  // Filter available courses - exclude already enrolled
+  const availableCoursesOnly = availableCourses.filter(course => 
+    !enrolledCourses.some(enrolled => enrolled.courseCode === course.courseCode)
+  );
+
+  // Filter courses based on search
+  const filteredCourses = availableCoursesOnly.filter(course => {
     const matchesSearch = course.courseName.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          course.courseCode.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          course.faculty.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesDepartment = selectedDepartment === 'All' || course.department === selectedDepartment;
-    const matchesSemester = selectedSemester === 'All' || course.semester === parseInt(selectedSemester);
-    
-    return matchesSearch && matchesDepartment && matchesSemester;
+    return matchesSearch;
   });
 
   const handleRegistrationFormChange = (e) => {
@@ -44,14 +49,6 @@ const CourseRegistration = () => {
   };
 
   const openRegistrationForm = (course) => {
-    // Check if already enrolled
-    const alreadyEnrolled = enrolledCourses.some(c => c.courseCode === course.courseCode);
-    
-    if (alreadyEnrolled) {
-      showNotification('error', 'Already enrolled in this course!');
-      return;
-    }
-
     // Check if course is full
     if (course.enrolled >= course.capacity) {
       showNotification('error', 'Course is full!');
@@ -66,8 +63,8 @@ const CourseRegistration = () => {
     e.preventDefault();
 
     // Validate form
-    if (!registrationData.name || !registrationData.email || !registrationData.rollNumber || !registrationData.gender) {
-      showNotification('error', 'Please fill all fields!');
+    if (!registrationData.gender) {
+      showNotification('error', 'Please select gender!');
       return;
     }
 
@@ -102,9 +99,35 @@ const CourseRegistration = () => {
     }, 3000);
   };
 
-  const handleDrop = (courseCode) => {
-    setEnrolledCourses(enrolledCourses.filter(c => c.courseCode !== courseCode));
-    showNotification('success', 'Course dropped successfully!');
+  const openDropRequestModal = (course) => {
+    setDropRequestData({
+      courseToDropName: course.courseName,
+      courseToDropCode: course.courseCode,
+      reason: '',
+      facultyEmail: course.faculty.toLowerCase().replace(/\s+/g, '.') + '@university.edu'
+    });
+    setShowDropRequestModal(true);
+  };
+
+  const handleDropRequestSubmit = (e) => {
+    e.preventDefault();
+
+    if (!dropRequestData.reason.trim()) {
+      showNotification('error', 'Please provide a reason for dropping the course!');
+      return;
+    }
+
+    // In real app, this would send email to faculty
+    console.log('Drop request submitted:', dropRequestData);
+    
+    showNotification('success', 'Drop request sent to faculty successfully!');
+    setShowDropRequestModal(false);
+    setDropRequestData({
+      courseToDropName: '',
+      courseToDropCode: '',
+      reason: '',
+      facultyEmail: ''
+    });
   };
 
   const showNotification = (type, message) => {
@@ -117,10 +140,6 @@ const CourseRegistration = () => {
   const openCourseDetailsModal = (course) => {
     setSelectedCourse(course);
     setShowDetailsModal(true);
-  };
-
-  const isEnrolled = (courseCode) => {
-    return enrolledCourses.some(c => c.courseCode === courseCode);
   };
 
   return (
@@ -163,17 +182,94 @@ const CourseRegistration = () => {
               <p className="text-sm text-green-700">{selectedCourse.courseCode}</p>
               <p className="text-sm text-green-600 mt-2">{selectedCourse.faculty}</p>
             </div>
-            <div className="bg-slate-50 rounded-lg p-4 mb-6">
-              <p className="text-sm text-slate-600 mb-1">Student Details</p>
-              <p className="font-semibold text-slate-900">{registrationData.name}</p>
-              <p className="text-sm text-slate-600">{registrationData.rollNumber}</p>
-            </div>
             <button
               onClick={() => setShowSuccessModal(false)}
               className="w-full bg-gradient-to-r from-green-600 to-emerald-600 text-white py-3 rounded-lg font-semibold hover:from-green-700 hover:to-emerald-700 transition-all"
             >
               Continue
             </button>
+          </div>
+        </div>
+      )}
+
+      {/* Drop Request Modal */}
+      {showDropRequestModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl max-w-lg w-full">
+            <div className="bg-gradient-to-r from-red-600 to-orange-600 p-6 text-white rounded-t-2xl">
+              <div className="flex items-start justify-between">
+                <div>
+                  <h2 className="text-2xl font-bold mb-2">Request Course Drop</h2>
+                  <p className="text-red-100">Send request to faculty</p>
+                </div>
+                <button
+                  onClick={() => setShowDropRequestModal(false)}
+                  className="text-white hover:bg-white/20 rounded-lg p-2 transition-all"
+                >
+                  <X className="w-6 h-6" />
+                </button>
+              </div>
+            </div>
+
+            <form onSubmit={handleDropRequestSubmit} className="p-6 space-y-4">
+              <div className="bg-orange-50 border border-orange-200 rounded-lg p-4">
+                <p className="text-sm text-orange-700 mb-2">
+                  <strong>Note:</strong> Your drop request will be sent to the course faculty for approval.
+                </p>
+                <p className="text-sm text-orange-600">
+                  Course: <strong>{dropRequestData.courseToDropName}</strong> ({dropRequestData.courseToDropCode})
+                </p>
+              </div>
+
+              {/* Faculty Email */}
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-2">
+                  Faculty Email
+                </label>
+                <div className="relative">
+                  <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400" />
+                  <input
+                    type="email"
+                    value={dropRequestData.facultyEmail}
+                    disabled
+                    className="w-full pl-10 pr-4 py-3 border border-slate-200 rounded-lg bg-slate-50 text-slate-600 outline-none"
+                  />
+                </div>
+              </div>
+
+              {/* Reason */}
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-2">
+                  Reason for Dropping <span className="text-red-500">*</span>
+                </label>
+                <textarea
+                  value={dropRequestData.reason}
+                  onChange={(e) => setDropRequestData({ ...dropRequestData, reason: e.target.value })}
+                  placeholder="Please explain why you want to drop this course..."
+                  rows="6"
+                  className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none transition-all"
+                  required
+                />
+              </div>
+
+              {/* Buttons */}
+              <div className="flex space-x-3 pt-4">
+                <button
+                  type="button"
+                  onClick={() => setShowDropRequestModal(false)}
+                  className="flex-1 py-3 border-2 border-slate-300 text-slate-700 rounded-lg font-semibold hover:bg-slate-50 transition-all"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="flex-1 py-3 bg-gradient-to-r from-red-600 to-orange-600 text-white rounded-lg font-semibold hover:from-red-700 hover:to-orange-700 transition-all shadow-lg flex items-center justify-center space-x-2"
+                >
+                  <Send className="w-5 h-5" />
+                  <span>Send Request</span>
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}
@@ -204,64 +300,55 @@ const CourseRegistration = () => {
                 </p>
               </div>
 
-              {/* Full Name */}
+              {/* Full Name - FROZEN */}
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-2">
-                  Full Name <span className="text-red-500">*</span>
+                  Full Name <span className="text-xs text-slate-500">(Cannot be changed)</span>
                 </label>
                 <div className="relative">
                   <User className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400" />
                   <input
                     type="text"
-                    name="name"
                     value={registrationData.name}
-                    onChange={handleRegistrationFormChange}
-                    placeholder="Enter your full name"
-                    className="w-full pl-10 pr-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
-                    required
+                    disabled
+                    className="w-full pl-10 pr-4 py-3 border border-slate-200 rounded-lg bg-slate-50 text-slate-600 outline-none cursor-not-allowed"
                   />
                 </div>
               </div>
 
-              {/* Email */}
+              {/* Email - FROZEN */}
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-2">
-                  Email Address <span className="text-red-500">*</span>
+                  Email Address <span className="text-xs text-slate-500">(Cannot be changed)</span>
                 </label>
                 <div className="relative">
                   <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400" />
                   <input
                     type="email"
-                    name="email"
                     value={registrationData.email}
-                    onChange={handleRegistrationFormChange}
-                    placeholder="your.email@university.edu"
-                    className="w-full pl-10 pr-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
-                    required
+                    disabled
+                    className="w-full pl-10 pr-4 py-3 border border-slate-200 rounded-lg bg-slate-50 text-slate-600 outline-none cursor-not-allowed"
                   />
                 </div>
               </div>
 
-              {/* Roll Number */}
+              {/* Roll Number - FROZEN */}
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-2">
-                  Roll Number <span className="text-red-500">*</span>
+                  Roll Number <span className="text-xs text-slate-500">(Cannot be changed)</span>
                 </label>
                 <div className="relative">
                   <Hash className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400" />
                   <input
                     type="text"
-                    name="rollNumber"
                     value={registrationData.rollNumber}
-                    onChange={handleRegistrationFormChange}
-                    placeholder="STU2024001"
-                    className="w-full pl-10 pr-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
-                    required
+                    disabled
+                    className="w-full pl-10 pr-4 py-3 border border-slate-200 rounded-lg bg-slate-50 text-slate-600 outline-none cursor-not-allowed"
                   />
                 </div>
               </div>
 
-              {/* Gender */}
+              {/* Gender - EDITABLE */}
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-2">
                   Gender <span className="text-red-500">*</span>
@@ -328,9 +415,9 @@ const CourseRegistration = () => {
         </div>
       )}
 
-      {/* Enrolled Courses Summary */}
+      {/* My Enrolled Courses - Card Layout like Available Courses */}
       <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
-        <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center justify-between mb-6">
           <h2 className="text-xl font-bold text-slate-900">My Enrolled Courses</h2>
           <span className="bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full text-sm font-semibold">
             {enrolledCourses.length} / 6 Courses
@@ -338,22 +425,46 @@ const CourseRegistration = () => {
         </div>
         
         {enrolledCourses.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {enrolledCourses.map(course => (
-              <div key={course.courseCode} className="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-lg p-4 border border-indigo-200">
-                <div className="flex items-start justify-between mb-2">
-                  <div>
-                    <h3 className="font-semibold text-slate-900">{course.courseName}</h3>
+              <div key={course.courseCode} className="border-2 border-green-200 bg-green-50 rounded-xl p-6 hover:shadow-lg transition-all">
+                <div className="flex items-start justify-between mb-4">
+                  <div className="flex-1">
+                    <h3 className="text-lg font-bold text-slate-900 mb-1">{course.courseName}</h3>
                     <p className="text-sm text-slate-600">{course.courseCode}</p>
                   </div>
-                  <button
-                    onClick={() => handleDrop(course.courseCode)}
-                    className="text-red-500 hover:text-red-700 p-1"
-                  >
-                    <X className="w-5 h-5" />
-                  </button>
+                  <div className="flex flex-col items-end space-y-2">
+                    <span className="bg-green-600 text-white px-3 py-1 rounded-full text-xs font-semibold">
+                      Enrolled
+                    </span>
+                    <span className="bg-slate-700 text-white px-3 py-1 rounded-full text-xs font-semibold">
+                      {course.credits} Credits
+                    </span>
+                  </div>
                 </div>
-                <p className="text-xs text-slate-600">{course.credits} Credits • {course.faculty}</p>
+
+                <div className="space-y-2 mb-4">
+                  <div className="flex items-center text-sm text-slate-600">
+                    <Users className="w-4 h-4 mr-2" />
+                    <span>{course.faculty}</span>
+                  </div>
+                  <div className="flex items-center text-sm text-slate-600">
+                    <Clock className="w-4 h-4 mr-2" />
+                    <span>{course.schedule}</span>
+                  </div>
+                  <div className="flex items-center text-sm text-slate-600">
+                    <MapPin className="w-4 h-4 mr-2" />
+                    <span>{course.room}</span>
+                  </div>
+                </div>
+
+                <button
+                  onClick={() => openDropRequestModal(course)}
+                  className="w-full py-2 bg-red-600 text-white rounded-lg font-semibold hover:bg-red-700 transition-all flex items-center justify-center space-x-2"
+                >
+                  <Mail className="w-4 h-4" />
+                  <span>Request to Drop</span>
+                </button>
               </div>
             ))}
           </div>
@@ -365,56 +476,21 @@ const CourseRegistration = () => {
         )}
       </div>
 
-      {/* Search and Filters */}
+      {/* Search Bar - Full Width */}
       <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          {/* Search */}
-          <div className="md:col-span-2">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400" />
-              <input
-                type="text"
-                placeholder="Search courses, code, or faculty..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none"
-              />
-            </div>
-          </div>
-
-          {/* Department Filter */}
-          <div>
-            <div className="relative">
-              <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400" />
-              <select
-                value={selectedDepartment}
-                onChange={(e) => setSelectedDepartment(e.target.value)}
-                className="w-full pl-10 pr-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none appearance-none bg-white"
-              >
-                {departments.map(dept => (
-                  <option key={dept} value={dept}>{dept}</option>
-                ))}
-              </select>
-            </div>
-          </div>
-
-          {/* Semester Filter */}
-          <div>
-            <select
-              value={selectedSemester}
-              onChange={(e) => setSelectedSemester(e.target.value)}
-              className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none appearance-none bg-white"
-            >
-              <option value="All">All Semesters</option>
-              {semesters.filter(s => s !== 'All').map(sem => (
-                <option key={sem} value={sem}>Semester {sem}</option>
-              ))}
-            </select>
-          </div>
+        <div className="relative">
+          <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-6 h-6 text-slate-400" />
+          <input
+            type="text"
+            placeholder="Search available courses by name, code, or faculty..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full pl-14 pr-6 py-4 text-lg border-2 border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none"
+          />
         </div>
       </div>
 
-      {/* Available Courses */}
+      {/* Available Courses - Only New Courses */}
       <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
         <h2 className="text-xl font-bold text-slate-900 mb-6">
           Available Courses ({filteredCourses.length})
@@ -422,7 +498,6 @@ const CourseRegistration = () => {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {filteredCourses.map(course => {
-            const enrolled = isEnrolled(course.courseCode);
             const isFull = course.enrolled >= course.capacity;
             const availableSeats = course.capacity - course.enrolled;
 
@@ -435,11 +510,9 @@ const CourseRegistration = () => {
                   </div>
                   <div className="flex flex-col items-end space-y-2">
                     <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                      enrolled ? 'bg-green-100 text-green-700' :
-                      isFull ? 'bg-red-100 text-red-700' :
-                      'bg-blue-100 text-blue-700'
+                      isFull ? 'bg-red-100 text-red-700' : 'bg-blue-100 text-blue-700'
                     }`}>
-                      {enrolled ? 'Enrolled' : isFull ? 'Full' : `${availableSeats} Seats Left`}
+                      {isFull ? 'Full' : `${availableSeats} Seats Left`}
                     </span>
                     <span className="bg-slate-100 text-slate-700 px-3 py-1 rounded-full text-xs font-semibold">
                       {course.credits} Credits
@@ -471,14 +544,14 @@ const CourseRegistration = () => {
                   </button>
                   <button
                     onClick={() => openRegistrationForm(course)}
-                    disabled={enrolled || isFull}
+                    disabled={isFull}
                     className={`flex-1 py-2 rounded-lg font-semibold transition-all ${
-                      enrolled || isFull
+                      isFull
                         ? 'bg-slate-100 text-slate-400 cursor-not-allowed'
                         : 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white hover:from-indigo-700 hover:to-purple-700'
                     }`}
                   >
-                    {enrolled ? 'Enrolled' : isFull ? 'Full' : 'Register'}
+                    {isFull ? 'Full' : 'Register'}
                   </button>
                 </div>
               </div>
@@ -490,7 +563,7 @@ const CourseRegistration = () => {
           <div className="text-center py-12 text-slate-500">
             <BookOpen className="w-16 h-16 mx-auto mb-4 text-slate-300" />
             <p className="text-lg">No courses found</p>
-            <p className="text-sm">Try adjusting your search or filters</p>
+            <p className="text-sm">Try adjusting your search</p>
           </div>
         )}
       </div>
@@ -570,16 +643,14 @@ const CourseRegistration = () => {
                   setShowDetailsModal(false);
                   openRegistrationForm(selectedCourse);
                 }}
-                disabled={isEnrolled(selectedCourse.courseCode) || selectedCourse.enrolled >= selectedCourse.capacity}
+                disabled={selectedCourse.enrolled >= selectedCourse.capacity}
                 className={`w-full py-3 rounded-lg font-semibold transition-all ${
-                  isEnrolled(selectedCourse.courseCode) || selectedCourse.enrolled >= selectedCourse.capacity
+                  selectedCourse.enrolled >= selectedCourse.capacity
                     ? 'bg-slate-100 text-slate-400 cursor-not-allowed'
                     : 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white hover:from-indigo-700 hover:to-purple-700'
                 }`}
               >
-                {isEnrolled(selectedCourse.courseCode) ? 'Already Enrolled' : 
-                 selectedCourse.enrolled >= selectedCourse.capacity ? 'Course Full' : 
-                 'Register for this Course'}
+                {selectedCourse.enrolled >= selectedCourse.capacity ? 'Course Full' : 'Register for this Course'}
               </button>
             </div>
           </div>
