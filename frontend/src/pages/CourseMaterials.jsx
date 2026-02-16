@@ -1,8 +1,10 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import { BookOpen, Download, FileText, File, X, Calendar, User, Search } from 'lucide-react';
 import { enrolledCourses, courseMaterials } from '../data/mockData';
 
 const CourseMaterials = () => {
+  const location = useLocation();
   const [selectedCourse, setSelectedCourse] = useState(null);
   const [showMaterialsModal, setShowMaterialsModal] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
@@ -12,6 +14,18 @@ const CourseMaterials = () => {
     setSelectedCourse(course);
     setShowMaterialsModal(true);
   };
+
+  // Auto-open modal if coming from MyCourses
+  useEffect(() => {
+    if (location.state?.selectedCourseCode) {
+      const course = enrolledCourses.find(c => c.courseCode === location.state.selectedCourseCode);
+      if (course) {
+        openCourseMaterials(course);
+      }
+      // Clear the state to prevent reopening on refresh
+      window.history.replaceState({}, document.title);
+    }
+  }, [location.state]);
 
   const handleDownload = (material) => {
     // In real app, this would download the actual file from server
