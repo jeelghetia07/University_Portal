@@ -25,11 +25,15 @@ const Timetable = () => {
 
   // Get class for a specific day and time slot
   const getClassForSlot = (day, timeSlot) => {
-    const daySchedule = timetable.find((d) => d.day === day);
-    if (!daySchedule) return null;
+  const daySchedule = timetable.find((d) => d.day === day);
+  if (!daySchedule) return null;
 
-    return daySchedule.classes.find((c) => c.time === timeSlot);
-  };
+  // Extract start time from slot (e.g., "9:00 AM" from "9:00 AM - 10:00 AM")
+  const slotStartTime = timeSlot.split(" - ")[0];
+
+  // Find class that starts at this time
+  return daySchedule.classes.find((c) => c.time.startsWith(slotStartTime));
+};
 
   // Color mapping for courses
   const courseColors = {
