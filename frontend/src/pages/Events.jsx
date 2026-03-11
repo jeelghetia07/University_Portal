@@ -254,6 +254,9 @@ const Events = () => {
                 <p className="text-sm text-purple-700">
                   Please confirm your details to complete the registration
                 </p>
+                <p className="text-xs text-purple-600 mt-1">
+                  You can edit phone number and team size. Other details are locked.
+                </p>
               </div>
 
               {/* Name */}
@@ -267,9 +270,9 @@ const Events = () => {
                     type="text"
                     name="name"
                     value={registrationData.name}
-                    onChange={handleInputChange}
+                    readOnly
                     required
-                    className="w-full pl-10 pr-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 outline-none"
+                    className="w-full pl-10 pr-4 py-3 border border-slate-200 rounded-lg bg-slate-100 text-slate-600 outline-none cursor-not-allowed"
                   />
                 </div>
               </div>
@@ -285,9 +288,9 @@ const Events = () => {
                     type="email"
                     name="email"
                     value={registrationData.email}
-                    onChange={handleInputChange}
+                    readOnly
                     required
-                    className="w-full pl-10 pr-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 outline-none"
+                    className="w-full pl-10 pr-4 py-3 border border-slate-200 rounded-lg bg-slate-100 text-slate-600 outline-none cursor-not-allowed"
                   />
                 </div>
               </div>
@@ -303,9 +306,9 @@ const Events = () => {
                     type="text"
                     name="rollNumber"
                     value={registrationData.rollNumber}
-                    onChange={handleInputChange}
+                    readOnly
                     required
-                    className="w-full pl-10 pr-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 outline-none"
+                    className="w-full pl-10 pr-4 py-3 border border-slate-200 rounded-lg bg-slate-100 text-slate-600 outline-none cursor-not-allowed"
                   />
                 </div>
               </div>

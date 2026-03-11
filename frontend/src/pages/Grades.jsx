@@ -4,6 +4,12 @@ import { gradesData } from '../data/mockData';
 
 const Grades = () => {
   const [selectedSemester, setSelectedSemester] = useState('current');
+  const INTERNAL_MAX = 30;
+  const EXTERNAL_MAX = 70;
+  const TOTAL_MAX = 100;
+  const OLD_INTERNAL_MAX = 40;
+  const OLD_EXTERNAL_MAX = 80;
+  const OLD_TOTAL_MAX = 120;
 
   // Get grade color
   const getGradeColor = (grade) => {
@@ -35,7 +41,20 @@ const Grades = () => {
   };
 
   const currentSGPA = calculateSGPA(gradesData.currentSemester);
-  const totalCredits = gradesData.currentSemester.reduce((sum, c) => sum + c.credits, 0);
+  const normalizedCurrentSemester = gradesData.currentSemester.map((course) => {
+    const scaledInternal = Math.round((course.internal / OLD_INTERNAL_MAX) * INTERNAL_MAX);
+    const scaledExternal = Math.round((course.external / OLD_EXTERNAL_MAX) * EXTERNAL_MAX);
+    const scaledTotal = Math.round((course.total / OLD_TOTAL_MAX) * TOTAL_MAX);
+
+    return {
+      ...course,
+      internal: scaledInternal,
+      external: scaledExternal,
+      total: scaledTotal,
+    };
+  });
+
+  const totalCredits = normalizedCurrentSemester.reduce((sum, c) => sum + c.credits, 0);
 
   return (
     <div className="space-y-6">
@@ -147,7 +166,7 @@ const Grades = () => {
                 </tr>
               </thead>
               <tbody>
-                {gradesData.currentSemester.map((course, index) => (
+                {normalizedCurrentSemester.map((course, index) => (
                   <tr key={index} className="border-b border-slate-100 hover:bg-slate-50 transition-all">
                     <td className="p-4">
                       <div>
@@ -158,15 +177,15 @@ const Grades = () => {
                     <td className="text-center p-4 text-slate-600">{course.code}</td>
                     <td className="text-center p-4">
                       <span className="text-slate-900 font-medium">{course.internal}</span>
-                      <span className="text-slate-500 text-sm"> / 40</span>
+                      <span className="text-slate-500 text-sm"> / {INTERNAL_MAX}</span>
                     </td>
                     <td className="text-center p-4">
                       <span className="text-slate-900 font-medium">{course.external}</span>
-                      <span className="text-slate-500 text-sm"> / 80</span>
+                      <span className="text-slate-500 text-sm"> / {EXTERNAL_MAX}</span>
                     </td>
                     <td className="text-center p-4">
                       <span className="text-slate-900 font-semibold">{course.total}</span>
-                      <span className="text-slate-500 text-sm"> / 120</span>
+                      <span className="text-slate-500 text-sm"> / {TOTAL_MAX}</span>
                     </td>
                     <td className="text-center p-4 text-slate-900 font-medium">{course.credits}</td>
                     <td className="text-center p-4">
@@ -182,7 +201,7 @@ const Grades = () => {
 
           {/* Mobile Card View */}
           <div className="md:hidden space-y-4">
-            {gradesData.currentSemester.map((course, index) => (
+            {normalizedCurrentSemester.map((course, index) => (
               <div key={index} className="border border-slate-200 rounded-lg p-4">
                 <div className="flex items-start justify-between mb-3">
                   <div>
@@ -197,15 +216,15 @@ const Grades = () => {
                 <div className="grid grid-cols-2 gap-3 text-sm">
                   <div>
                     <p className="text-slate-600">Internal</p>
-                    <p className="font-semibold text-slate-900">{course.internal} / 40</p>
+                    <p className="font-semibold text-slate-900">{course.internal} / {INTERNAL_MAX}</p>
                   </div>
                   <div>
                     <p className="text-slate-600">External</p>
-                    <p className="font-semibold text-slate-900">{course.external} / 80</p>
+                    <p className="font-semibold text-slate-900">{course.external} / {EXTERNAL_MAX}</p>
                   </div>
                   <div>
                     <p className="text-slate-600">Total</p>
-                    <p className="font-semibold text-slate-900">{course.total} / 120</p>
+                    <p className="font-semibold text-slate-900">{course.total} / {TOTAL_MAX}</p>
                   </div>
                   <div>
                     <p className="text-slate-600">Credits</p>

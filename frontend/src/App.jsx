@@ -39,6 +39,7 @@ function App() {
         {/* Public Routes */}
         <Route path="/" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
+        <Route path="/library" element={<Navigate to="/course-materials" replace />} />
 
         {/* Protected Routes */}
         <Route

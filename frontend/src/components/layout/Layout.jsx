@@ -10,7 +10,7 @@ const Layout = ({ children }) => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-slate-100 to-slate-50">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-slate-100 to-slate-50 dark:from-slate-900 dark:via-slate-950 dark:to-slate-900">
       {/* Sidebar */}
       <Sidebar isOpen={sidebarOpen} toggleSidebar={toggleSidebar} />
 
@@ -27,20 +27,20 @@ const Layout = ({ children }) => {
         </main>
 
         {/* Footer */}
-        <footer className="bg-white border-t border-slate-200 py-4 px-6">
+        <footer className="bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-700 py-4 px-6">
           <div className="max-w-7xl mx-auto">
             <div className="flex flex-col md:flex-row justify-between items-center space-y-2 md:space-y-0">
-              <p className="text-sm text-slate-600">
-                © 2025 University Portal. All rights reserved.
+              <p className="text-sm text-slate-600 dark:text-slate-400">
+                (c) 2025 University Portal. All rights reserved.
               </p>
               <div className="flex items-center space-x-6">
-                <a href="#" className="text-sm text-slate-600 hover:text-indigo-600 transition-colors">
+                <a href="#" className="text-sm text-slate-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
                   Privacy Policy
                 </a>
-                <a href="#" className="text-sm text-slate-600 hover:text-indigo-600 transition-colors">
+                <a href="#" className="text-sm text-slate-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
                   Terms of Service
                 </a>
-                <a href="#" className="text-sm text-slate-600 hover:text-indigo-600 transition-colors">
+                <a href="#" className="text-sm text-slate-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
                   Help Center
                 </a>
               </div>

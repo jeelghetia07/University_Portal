@@ -50,7 +50,7 @@ const MyCourses = () => {
 
   // Navigate to Course Materials with selected course
   const handleViewMaterials = (course) => {
-    navigate('/library', { state: { selectedCourseCode: course.courseCode } });
+    navigate('/course-materials', { state: { selectedCourseCode: course.courseCode } });
   };
 
   const handleDropRequestSubmit = (e) => {

@@ -41,7 +41,7 @@ const Navbar = ({ toggleSidebar }) => {
   };
 
   return (
-    <nav className="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-sm">
+    <nav className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700 sticky top-0 z-30 shadow-sm">
       <div className="px-4 lg:px-6 py-3">
         <div className="flex items-center justify-between">
           {/* Left Section */}
@@ -49,18 +49,18 @@ const Navbar = ({ toggleSidebar }) => {
             {/* Mobile Menu Button */}
             <button
               onClick={toggleSidebar}
-              className="lg:hidden text-slate-600 hover:text-slate-900 transition-colors p-2 hover:bg-slate-100 rounded-lg"
+              className="lg:hidden text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-colors p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg"
             >
               <Menu className="w-6 h-6" />
             </button>
 
             {/* Search Bar */}
-            <div className="hidden md:flex items-center bg-slate-100 rounded-lg px-4 py-2 w-80 group focus-within:ring-2 focus-within:ring-indigo-500/20 transition-all">
+            <div className="hidden md:flex items-center bg-slate-100 dark:bg-slate-800 rounded-lg px-4 py-2 w-80 group focus-within:ring-2 focus-within:ring-indigo-500/20 transition-all">
               <Search className="w-4 h-4 text-slate-400 group-focus-within:text-indigo-600 transition-colors" />
               <input
                 type="text"
                 placeholder="Search courses, faculty, events..."
-                className="bg-transparent border-none outline-none ml-2 text-sm text-slate-700 placeholder-slate-400 w-full"
+                className="bg-transparent border-none outline-none ml-2 text-sm text-slate-700 dark:text-slate-200 placeholder-slate-400 w-full"
               />
             </div>
           </div>
@@ -71,7 +71,7 @@ const Navbar = ({ toggleSidebar }) => {
             <div className="relative">
               <button
                 onClick={() => setShowNotifications(!showNotifications)}
-                className="relative p-2 text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-all"
+                className="relative p-2 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-all"
               >
                 <Bell className="w-5 h-5" />
                 {unreadCount > 0 && (
@@ -81,9 +81,9 @@ const Navbar = ({ toggleSidebar }) => {
 
               {/* Notifications Dropdown */}
               {showNotifications && (
-                <div className="absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-xl border border-slate-200 py-2 animate-fadeIn">
-                  <div className="px-4 py-2 border-b border-slate-200">
-                    <h3 className="text-sm font-semibold text-slate-900">
+                <div className="absolute right-0 mt-2 w-80 bg-white dark:bg-slate-900 rounded-lg shadow-xl border border-slate-200 dark:border-slate-700 py-2 animate-fadeIn">
+                  <div className="px-4 py-2 border-b border-slate-200 dark:border-slate-700">
+                    <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100">
                       Notifications
                     </h3>
                   </div>
@@ -91,8 +91,8 @@ const Navbar = ({ toggleSidebar }) => {
                     {notifications.map((notif) => (
                       <div
                         key={notif.id}
-                        className={`px-4 py-3 hover:bg-slate-50 cursor-pointer transition-colors ${
-                          notif.unread ? "bg-indigo-50/50" : ""
+                        className={`px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer transition-colors ${
+                          notif.unread ? "bg-indigo-50/50 dark:bg-indigo-900/20" : ""
                         }`}
                       >
                         <div className="flex items-start space-x-3">
@@ -100,10 +100,10 @@ const Navbar = ({ toggleSidebar }) => {
                             <div className="w-2 h-2 bg-indigo-600 rounded-full mt-1.5"></div>
                           )}
                           <div className="flex-1">
-                            <p className="text-sm text-slate-900 font-medium">
+                            <p className="text-sm text-slate-900 dark:text-slate-100 font-medium">
                               {notif.title}
                             </p>
-                            <p className="text-xs text-slate-500 mt-0.5">
+                            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
                               {notif.time}
                             </p>
                           </div>
@@ -111,10 +111,10 @@ const Navbar = ({ toggleSidebar }) => {
                       </div>
                     ))}
                   </div>
-                  <div className="px-4 py-2 border-t border-slate-200">
+                  <div className="px-4 py-2 border-t border-slate-200 dark:border-slate-700">
                     <Link
                       to="/announcements"
-                      className="text-sm text-indigo-600 hover:text-indigo-700 font-medium"
+                      className="text-sm text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300 font-medium"
                       onClick={() => setShowNotifications(false)}
                     >
                       View all notifications
@@ -128,33 +128,33 @@ const Navbar = ({ toggleSidebar }) => {
             <div className="relative">
               <button
                 onClick={() => setShowProfileMenu(!showProfileMenu)}
-                className="flex items-center space-x-3 hover:bg-slate-100 rounded-lg px-3 py-2 transition-all group"
+                className="flex items-center space-x-3 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg px-3 py-2 transition-all group"
               >
                 <img
                   src={currentUser.profilePic}
                   alt={currentUser.name}
-                  className="w-8 h-8 rounded-full ring-2 ring-slate-200 group-hover:ring-indigo-500 transition-all"
+                  className="w-8 h-8 rounded-full ring-2 ring-slate-200 dark:ring-slate-700 group-hover:ring-indigo-500 transition-all"
                 />
                 <div className="hidden md:block text-left">
-                  <p className="text-sm font-semibold text-slate-900">
+                  <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">
                     {currentUser.name}
                   </p>
-                  <p className="text-xs text-slate-500">
+                  <p className="text-xs text-slate-500 dark:text-slate-400">
                     {localStorage.getItem("userDepartment") ||
                       currentUser.department}
                   </p>
                 </div>
-                <ChevronDown className="w-4 h-4 text-slate-400 group-hover:text-slate-600 transition-colors" />
+                <ChevronDown className="w-4 h-4 text-slate-400 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors" />
               </button>
 
               {/* Profile Menu Dropdown */}
               {showProfileMenu && (
-                <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-xl border border-slate-200 py-2 animate-fadeIn">
-                  <div className="px-4 py-3 border-b border-slate-200">
-                    <p className="text-sm font-semibold text-slate-900">
+                <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-slate-900 rounded-lg shadow-xl border border-slate-200 dark:border-slate-700 py-2 animate-fadeIn">
+                  <div className="px-4 py-3 border-b border-slate-200 dark:border-slate-700">
+                    <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">
                       {currentUser.name}
                     </p>
-                    <p className="text-xs text-slate-500">
+                    <p className="text-xs text-slate-500 dark:text-slate-400">
                       {currentUser.email}
                     </p>
                   </div>
@@ -163,7 +163,7 @@ const Navbar = ({ toggleSidebar }) => {
                     <Link
                       to="/profile"
                       onClick={() => setShowProfileMenu(false)}
-                      className="flex items-center space-x-3 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 transition-colors"
+                      className="flex items-center space-x-3 px-4 py-2 text-sm text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
                     >
                       <User className="w-4 h-4" />
                       <span>My Profile</span>
@@ -171,17 +171,17 @@ const Navbar = ({ toggleSidebar }) => {
                     <Link
                       to="/settings"
                       onClick={() => setShowProfileMenu(false)}
-                      className="flex items-center space-x-3 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 transition-colors"
+                      className="flex items-center space-x-3 px-4 py-2 text-sm text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
                     >
                       <Settings className="w-4 h-4" />
                       <span>Settings</span>
                     </Link>
                   </div>
 
-                  <div className="border-t border-slate-200 py-1">
+                  <div className="border-t border-slate-200 dark:border-slate-700 py-1">
                     <button
                       onClick={handleLogout}
-                      className="flex items-center space-x-3 px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors w-full"
+                      className="flex items-center space-x-3 px-4 py-2 text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors w-full"
                     >
                       <LogOut className="w-4 h-4" />
                       <span>Logout</span>
