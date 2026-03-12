@@ -366,14 +366,14 @@ const MyCourses = () => {
 
             <div className="p-6 space-y-6">
               <div className="grid grid-cols-3 gap-4">
-                <div className="bg-purple-50 rounded-lg p-4 text-center">
+                <div className="bg-purple-50 dark:bg-slate-800 rounded-lg p-4 text-center">
                   <Award className="w-8 h-8 text-purple-600 mx-auto mb-2" />
                   <p className="text-2xl font-bold text-slate-900">
                     {selectedCourse.credits}
                   </p>
                   <p className="text-xs text-slate-600">Credits</p>
                 </div>
-                <div className="bg-green-50 rounded-lg p-4 text-center">
+                <div className="bg-green-50 dark:bg-slate-800 rounded-lg p-4 text-center">
                   <TrendingUp className="w-8 h-8 text-green-600 mx-auto mb-2" />
                   <p className="text-2xl font-bold text-slate-900">
                     {selectedCourse.attendance}%
@@ -381,7 +381,7 @@ const MyCourses = () => {
                   <p className="text-xs text-slate-600">Attendance</p>
                 </div>
                 <div
-                  className={`bg-${getGradeColor(selectedCourse.grade)}-50 rounded-lg p-4 text-center`}
+                  className={`bg-${getGradeColor(selectedCourse.grade)}-50 dark:bg-slate-800 rounded-lg p-4 text-center`}
                 >
                   <FileText
                     className={`w-8 h-8 text-${getGradeColor(selectedCourse.grade)}-600 mx-auto mb-2`}
@@ -398,7 +398,7 @@ const MyCourses = () => {
                   Course Information
                 </h3>
                 <div className="space-y-4">
-                  <div className="flex items-start bg-slate-50 rounded-lg p-4">
+                  <div className="flex items-start bg-slate-50 dark:bg-slate-800 rounded-lg p-4">
                     <Users className="w-5 h-5 text-slate-400 mr-3 mt-0.5" />
                     <div className="flex-1">
                       <p className="text-sm text-slate-600 mb-1">Instructor</p>
@@ -407,7 +407,7 @@ const MyCourses = () => {
                       </p>
                     </div>
                   </div>
-                  <div className="flex items-start bg-slate-50 rounded-lg p-4">
+                  <div className="flex items-start bg-slate-50 dark:bg-slate-800 rounded-lg p-4">
                     <Clock className="w-5 h-5 text-slate-400 mr-3 mt-0.5" />
                     <div className="flex-1">
                       <p className="text-sm text-slate-600 mb-1">
@@ -418,7 +418,7 @@ const MyCourses = () => {
                       </p>
                     </div>
                   </div>
-                  <div className="flex items-start bg-slate-50 rounded-lg p-4">
+                  <div className="flex items-start bg-slate-50 dark:bg-slate-800 rounded-lg p-4">
                     <MapPin className="w-5 h-5 text-slate-400 mr-3 mt-0.5" />
                     <div className="flex-1">
                       <p className="text-sm text-slate-600 mb-1">Classroom</p>
@@ -427,7 +427,7 @@ const MyCourses = () => {
                       </p>
                     </div>
                   </div>
-                  <div className="flex items-start bg-slate-50 rounded-lg p-4">
+                  <div className="flex items-start bg-slate-50 dark:bg-slate-800 rounded-lg p-4">
                     <Calendar className="w-5 h-5 text-slate-400 mr-3 mt-0.5" />
                     <div className="flex-1">
                       <p className="text-sm text-slate-600 mb-1">
@@ -451,7 +451,7 @@ const MyCourses = () => {
                 <h3 className="font-semibold text-slate-900 mb-4 text-lg">
                   Attendance Overview
                 </h3>
-                <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg p-6 border border-green-200">
+                <div className="bg-gradient-to-r from-green-50 to-emerald-50 dark:from-slate-800 dark:to-slate-800 rounded-lg p-6 border border-green-200 dark:border-slate-700">
                   <div className="flex items-center justify-between mb-4">
                     <span className="text-lg font-semibold text-slate-900">
                       Current Attendance
@@ -460,7 +460,7 @@ const MyCourses = () => {
                       {selectedCourse.attendance}%
                     </span>
                   </div>
-                  <div className="w-full bg-white rounded-full h-3 mb-3">
+                  <div className="w-full bg-white dark:bg-slate-700 rounded-full h-3 mb-3">
                     <div
                       className="bg-gradient-to-r from-green-500 to-emerald-500 h-3 rounded-full transition-all"
                       style={{ width: `${selectedCourse.attendance}%` }}
