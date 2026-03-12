@@ -144,7 +144,7 @@ const Dashboard = () => {
               todayClasses.map((cls, index) => (
                 <div
                   key={index}
-                  className="flex items-center space-x-4 p-4 bg-slate-50 rounded-lg hover:bg-slate-100 transition-colors"
+                  className="flex items-center space-x-4 p-4 bg-slate-50 dark:bg-slate-800 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
                 >
                   <div className="flex-shrink-0 w-16 text-center">
                     <p className="text-xs font-semibold text-indigo-600">
@@ -196,7 +196,7 @@ const Dashboard = () => {
             {announcements.slice(0, 4).map((announcement) => (
               <div
                 key={announcement.id}
-                className="p-3 bg-slate-50 rounded-lg hover:bg-slate-100 transition-colors cursor-pointer"
+                className="p-3 bg-slate-50 dark:bg-slate-800 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors cursor-pointer"
               >
                 <div className="flex items-start space-x-3">
                   <div
@@ -235,7 +235,7 @@ const Dashboard = () => {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <Link
             to="/course-registration"
-            className="flex flex-col items-center p-4 bg-gradient-to-br from-indigo-50 to-purple-50 rounded-lg hover:shadow-md transition-all group"
+            className="flex flex-col items-center p-4 bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-slate-800 dark:to-slate-800 rounded-lg hover:shadow-md dark:hover:bg-slate-700 transition-all group"
           >
             <div className="w-12 h-12 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-lg flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
               <BookOpen className="w-6 h-6 text-white" />
@@ -247,7 +247,7 @@ const Dashboard = () => {
 
           <Link
             to="/timetable"
-            className="flex flex-col items-center p-4 bg-gradient-to-br from-green-50 to-emerald-50 rounded-lg hover:shadow-md transition-all group"
+            className="flex flex-col items-center p-4 bg-gradient-to-br from-green-50 to-emerald-50 dark:from-slate-800 dark:to-slate-800 rounded-lg hover:shadow-md dark:hover:bg-slate-700 transition-all group"
           >
             <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-600 rounded-lg flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
               <Calendar className="w-6 h-6 text-white" />
@@ -259,7 +259,7 @@ const Dashboard = () => {
 
           <Link
             to="/grades"
-            className="flex flex-col items-center p-4 bg-gradient-to-br from-purple-50 to-pink-50 rounded-lg hover:shadow-md transition-all group"
+            className="flex flex-col items-center p-4 bg-gradient-to-br from-purple-50 to-pink-50 dark:from-slate-800 dark:to-slate-800 rounded-lg hover:shadow-md dark:hover:bg-slate-700 transition-all group"
           >
             <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-600 rounded-lg flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
               <Award className="w-6 h-6 text-white" />
@@ -271,7 +271,7 @@ const Dashboard = () => {
 
           <Link
             to="/course-materials"
-            className="flex flex-col items-center p-4 bg-gradient-to-br from-orange-50 to-red-50 rounded-lg hover:shadow-md transition-all group"
+            className="flex flex-col items-center p-4 bg-gradient-to-br from-orange-50 to-red-50 dark:from-slate-800 dark:to-slate-800 rounded-lg hover:shadow-md dark:hover:bg-slate-700 transition-all group"
           >
             <div className="w-12 h-12 bg-gradient-to-br from-orange-500 to-red-600 rounded-lg flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
               <BookOpen className="w-6 h-6 text-white" />
