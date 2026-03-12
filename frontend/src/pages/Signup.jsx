@@ -16,6 +16,7 @@ const Signup = () => {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
+    recoveryEmail: "",
     password: "",
     confirmPassword: "",
     studentID: "",
@@ -41,8 +42,13 @@ const Signup = () => {
     setError("");
 
     // Validation
-    if (!formData.name || !formData.email || !formData.password || !formData.confirmPassword) {
+    if (!formData.name || !formData.email || !formData.recoveryEmail || !formData.password || !formData.confirmPassword) {
       setError("Please fill in all required fields");
+      return;
+    }
+
+    if (formData.recoveryEmail === formData.email) {
+      setError("Recovery email should be different from your university email");
       return;
     }
 
@@ -67,6 +73,7 @@ const Signup = () => {
     setTimeout(() => {
       // Store signup info in localStorage
       localStorage.setItem("signupEmail", formData.email);
+      localStorage.setItem("signupRecoveryEmail", formData.recoveryEmail);
       localStorage.setItem("signupName", formData.name);
       localStorage.setItem("justSignedUp", "true");
 
@@ -206,8 +213,8 @@ const Signup = () => {
                     name="name"
                     value={formData.name}
                     onChange={handleChange}
-                    placeholder="Rahul Sharma"
-                    className="w-full pl-10 pr-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
+                    placeholder="Enter your full name."
+                    className="w-full pl-10 pr-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all placeholder:text-slate-500 text-slate-900"
                   />
                 </div>
               </div>
@@ -224,8 +231,8 @@ const Signup = () => {
                     name="email"
                     value={formData.email}
                     onChange={handleChange}
-                    placeholder="student@university.edu"
-                    className="w-full pl-10 pr-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
+                    placeholder="2XXXXXXX@university.edu"
+                    className="w-full pl-10 pr-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all placeholder:text-slate-500 text-slate-900"
                   />
                 </div>
               </div>
@@ -242,8 +249,26 @@ const Signup = () => {
                     name="studentID"
                     value={formData.studentID}
                     onChange={handleChange}
-                    placeholder="STU2024001"
-                    className="w-full pl-10 pr-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
+                    placeholder="Enter your roll number."
+                    className="w-full pl-10 pr-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all placeholder:text-slate-500 text-slate-900"
+                  />
+                </div>
+              </div>
+
+              {/* Recovery Email */}
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-2">
+                  Recovery Email <span className="text-red-500">*</span>
+                </label>
+                <div className="relative">
+                  <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400" />
+                  <input
+                    type="email"
+                    name="recoveryEmail"
+                    value={formData.recoveryEmail}
+                    onChange={handleChange}
+                    placeholder="Enter your personal email."
+                    className="w-full pl-10 pr-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all placeholder:text-slate-500 text-slate-900"
                   />
                 </div>
               </div>
@@ -259,7 +284,9 @@ const Signup = () => {
                     name="department"
                     value={formData.department}
                     onChange={handleChange}
-                    className="w-full pl-10 pr-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all appearance-none bg-white"
+                    className={`w-full pl-10 pr-10 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all appearance-none bg-white ${
+                      formData.department ? "text-slate-800" : "text-slate-500"
+                    }`}
                   >
                     <option value="">Select Department</option>
                     <option value="Computer Science">Computer Science</option>
@@ -285,7 +312,9 @@ const Signup = () => {
                     name="semester"
                     value={formData.semester}
                     onChange={handleChange}
-                    className="w-full pl-10 pr-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all appearance-none bg-white"
+                    className={`w-full pl-10 pr-10 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all appearance-none bg-white ${
+                      formData.semester ? "text-slate-800" : "text-slate-500"
+                    }`}
                   >
                     <option value="">Select Semester</option>
                     {[1, 2, 3, 4, 5, 6, 7, 8].map((sem) => (
@@ -310,7 +339,7 @@ const Signup = () => {
                     value={formData.password}
                     onChange={handleChange}
                     placeholder="Min. 6 characters"
-                    className="w-full pl-10 pr-12 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
+                    className="w-full pl-10 pr-12 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all placeholder:text-slate-500 text-slate-900"
                   />
                   <button
                     type="button"
@@ -339,7 +368,7 @@ const Signup = () => {
                     value={formData.confirmPassword}
                     onChange={handleChange}
                     placeholder="Re-enter password"
-                    className="w-full pl-10 pr-12 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
+                    className="w-full pl-10 pr-12 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all placeholder:text-slate-500 text-slate-900"
                   />
                   <button
                     type="button"
