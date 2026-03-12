@@ -23,7 +23,6 @@ export const ThemeProvider = ({ children }) => {
     if (activeTheme === "dark") {
       root.classList.add("dark");
     }
-    root.style.colorScheme = activeTheme;
   };
 
   useEffect(() => {
