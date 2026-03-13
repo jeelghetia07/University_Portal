@@ -25,12 +25,12 @@ const Events = () => {
 
   const getCategoryColor = (category) => {
     const colors = {
-      Technical: 'bg-blue-100 text-blue-700 border-blue-300',
-      Cultural: 'bg-pink-100 text-pink-700 border-pink-300',
-      Sports: 'bg-green-100 text-green-700 border-green-300',
-      Career: 'bg-purple-100 text-purple-700 border-purple-300'
+      Technical: 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-200 border-blue-300 dark:border-blue-700',
+      Cultural: 'bg-pink-100 dark:bg-pink-900/30 text-pink-700 dark:text-pink-200 border-pink-300 dark:border-pink-700',
+      Sports: 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-200 border-green-300 dark:border-green-700',
+      Career: 'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-200 border-purple-300 dark:border-purple-700'
     };
-    return colors[category] || 'bg-slate-100 text-slate-700 border-slate-300';
+    return colors[category] || 'bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 border-slate-300 dark:border-slate-600';
   };
 
   const getCategoryIcon = (category) => {
@@ -120,7 +120,7 @@ const Events = () => {
           <h2 className="text-xl font-bold text-slate-900 mb-4">My Registered Events</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {registeredEvents.map(event => (
-              <div key={event.id} className="border-2 border-purple-200 bg-purple-50 rounded-lg p-4">
+              <div key={event.id} className="border-2 border-purple-200 dark:border-slate-600 bg-purple-50 dark:bg-slate-800 rounded-lg p-4">
                 <div className="flex items-start justify-between mb-3">
                   <div>
                     <div className="flex items-center space-x-2 mb-2">
@@ -132,14 +132,14 @@ const Events = () => {
                   <CheckCircle className="w-6 h-6 text-green-600" />
                 </div>
 
-                <div className="bg-white rounded-lg p-3 mb-3">
+                <div className="bg-white dark:bg-slate-900 rounded-lg p-3 mb-3 border border-slate-200 dark:border-slate-700">
                   <p className="text-xs text-slate-600">Registration ID</p>
                   <p className="font-mono text-sm font-semibold text-slate-900">{event.registrationId}</p>
                 </div>
 
                 <button
                   onClick={() => handleCancelRegistration(event.id)}
-                  className="w-full py-2 border border-red-300 text-red-600 rounded-lg font-semibold hover:bg-red-50 transition-all"
+                  className="w-full py-2 border border-red-300 dark:border-red-700 text-red-600 dark:text-red-300 rounded-lg font-semibold hover:bg-red-50 dark:hover:bg-red-900/20 transition-all"
                 >
                   Cancel Registration
                 </button>
@@ -163,7 +163,7 @@ const Events = () => {
               <div
                 key={event.id}
                 className={`border-2 rounded-xl p-5 hover:shadow-lg transition-all ${
-                  registered ? 'border-green-300 bg-green-50' : 'border-slate-200'
+                  registered ? 'border-green-300 dark:border-green-700 bg-green-50 dark:bg-slate-800' : 'border-slate-200'
                 }`}
               >
                 <div className="flex items-start justify-between mb-4">
@@ -205,7 +205,7 @@ const Events = () => {
 
                 <div className="flex items-center justify-between mb-4">
                   <span className={`text-xs font-semibold px-2 py-1 rounded-full ${
-                    event.registrationOpen ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
+                    event.registrationOpen ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-200' : 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-200'
                   }`}>
                     {event.registrationOpen ? 'Registration Open' : 'Registration Closed'}
                   </span>
@@ -216,7 +216,7 @@ const Events = () => {
                   disabled={!event.registrationOpen || registered}
                   className={`w-full py-2 rounded-lg font-semibold transition-all ${
                     registered
-                      ? 'bg-green-100 text-green-700 cursor-not-allowed'
+                      ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-200 cursor-not-allowed'
                       : event.registrationOpen
                       ? 'bg-purple-600 text-white hover:bg-purple-700'
                       : 'bg-slate-200 text-slate-400 cursor-not-allowed'

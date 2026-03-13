@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { DollarSign, Download, CreditCard, Calendar, CheckCircle, AlertCircle, FileText } from 'lucide-react';
+import { DollarSign, CreditCard, Calendar, CheckCircle, AlertCircle, FileText } from 'lucide-react';
 import { feeData } from '../data/mockData';
 
 const Fees = () => {
@@ -18,31 +18,31 @@ const Fees = () => {
       {/* Fee Status Card */}
       <div className={`rounded-xl shadow-sm border-2 p-6 ${
         isPaid 
-          ? 'bg-gradient-to-br from-green-50 to-emerald-50 border-green-200' 
-          : 'bg-gradient-to-br from-red-50 to-orange-50 border-red-200'
+          ? 'bg-gradient-to-br from-green-50 to-emerald-50 dark:from-slate-900 dark:to-slate-800 border-green-200 dark:border-green-700' 
+          : 'bg-gradient-to-br from-red-50 to-orange-50 dark:from-slate-900 dark:to-slate-800 border-red-200 dark:border-red-700'
       }`}>
         <div className="flex items-start justify-between mb-6">
           <div className="flex items-center space-x-4">
             <div className={`w-16 h-16 rounded-full flex items-center justify-center ${
-              isPaid ? 'bg-green-100' : 'bg-red-100'
+              isPaid ? 'bg-green-100 dark:bg-green-900/30' : 'bg-red-100 dark:bg-red-900/30'
             }`}>
               {isPaid ? (
-                <CheckCircle className="w-8 h-8 text-green-600" />
+                <CheckCircle className="w-8 h-8 text-green-600 dark:text-green-300" />
               ) : (
-                <AlertCircle className="w-8 h-8 text-red-600" />
+                <AlertCircle className="w-8 h-8 text-red-600 dark:text-red-300" />
               )}
             </div>
             <div>
-              <h2 className="text-2xl font-bold text-slate-900">
+              <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100">
                 {isPaid ? 'Fee Paid' : 'Payment Pending'}
               </h2>
-              <p className={`text-sm ${isPaid ? 'text-green-700' : 'text-red-700'}`}>
+              <p className={`text-sm ${isPaid ? 'text-green-700 dark:text-green-300' : 'text-red-700 dark:text-red-300'}`}>
                 {isPaid ? 'All dues cleared for this semester' : `Due date: ${new Date(feeData.dueDate).toLocaleDateString()}`}
               </p>
             </div>
           </div>
           <span className={`px-4 py-2 rounded-full text-sm font-bold ${
-            isPaid ? 'bg-green-200 text-green-800' : 'bg-red-200 text-red-800'
+            isPaid ? 'bg-green-200 text-green-800 dark:bg-green-900/40 dark:text-green-200' : 'bg-red-200 text-red-800 dark:bg-red-900/40 dark:text-red-200'
           }`}>
             {feeData.status}
           </span>
@@ -81,7 +81,7 @@ const Fees = () => {
         
         <div className="space-y-3">
           {feeData.breakdown.map((item, index) => (
-            <div key={index} className="flex items-center justify-between p-4 bg-slate-50 rounded-lg hover:bg-slate-100 transition-all">
+            <div key={index} className="flex items-center justify-between p-4 bg-slate-50 rounded-lg">
               <div className="flex items-center space-x-3">
                 <div className="w-10 h-10 bg-indigo-100 rounded-lg flex items-center justify-center">
                   <DollarSign className="w-5 h-5 text-indigo-600" />
@@ -92,7 +92,7 @@ const Fees = () => {
             </div>
           ))}
           
-          <div className="flex items-center justify-between p-4 bg-gradient-to-r from-indigo-50 to-purple-50 rounded-lg border-2 border-indigo-200 mt-4">
+          <div className="flex items-center justify-between p-4 bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-slate-800 dark:to-slate-800 rounded-lg border-2 border-indigo-200 dark:border-slate-600 mt-4">
             <span className="font-bold text-slate-900 text-lg">Total Fee</span>
             <span className="text-2xl font-bold text-indigo-600">₹{feeData.totalFee.toLocaleString()}</span>
           </div>
@@ -101,12 +101,8 @@ const Fees = () => {
 
       {/* Payment History */}
       <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
-        <div className="flex items-center justify-between mb-6">
+        <div className="mb-6">
           <h2 className="text-xl font-bold text-slate-900">Payment History</h2>
-          <button className="flex items-center space-x-2 px-4 py-2 bg-indigo-50 text-indigo-600 rounded-lg hover:bg-indigo-100 transition-all">
-            <Download className="w-4 h-4" />
-            <span className="font-semibold text-sm">Download All</span>
-          </button>
         </div>
 
         {/* Desktop Table */}
@@ -124,7 +120,7 @@ const Fees = () => {
             </thead>
             <tbody>
               {feeData.paymentHistory.map((payment, index) => (
-                <tr key={index} className="border-b border-slate-100 hover:bg-slate-50 transition-all">
+                <tr key={index} className="border-b border-slate-100">
                   <td className="p-4">
                     <div className="flex items-center space-x-2">
                       <Calendar className="w-4 h-4 text-slate-400" />
@@ -151,10 +147,7 @@ const Fees = () => {
                     </span>
                   </td>
                   <td className="p-4 text-right">
-                    <button className="flex items-center space-x-1 px-3 py-1.5 text-indigo-600 hover:bg-indigo-50 rounded-lg transition-all ml-auto">
-                      <Download className="w-4 h-4" />
-                      <span className="text-sm font-medium">Receipt</span>
-                    </button>
+                    <span className="text-sm text-slate-500">Receipt available</span>
                   </td>
                 </tr>
               ))}
@@ -193,10 +186,9 @@ const Fees = () => {
                 </div>
               </div>
 
-              <button className="w-full flex items-center justify-center space-x-2 py-2 bg-indigo-50 text-indigo-600 rounded-lg hover:bg-indigo-100 transition-all">
-                <Download className="w-4 h-4" />
-                <span className="font-medium">Download Receipt</span>
-              </button>
+              <div className="w-full flex items-center justify-center py-2 bg-slate-50 rounded-lg">
+                <span className="font-medium text-slate-500">Receipt available</span>
+              </div>
             </div>
           ))}
         </div>

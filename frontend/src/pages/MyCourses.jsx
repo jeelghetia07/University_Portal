@@ -10,7 +10,6 @@ import {
   Calendar,
   FileText,
   X,
-  Download,
   Mail,
   Send,
   AlertTriangle,
@@ -177,10 +176,6 @@ const MyCourses = () => {
       <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-xl font-bold text-slate-900">Enrolled Courses</h2>
-          <button className="flex items-center space-x-2 px-4 py-2 bg-indigo-50 text-indigo-600 rounded-lg hover:bg-indigo-100 transition-all">
-            <Download className="w-4 h-4" />
-            <span className="text-sm font-semibold">Download Schedule</span>
-          </button>
         </div>
 
         <div className="grid grid-cols-1 gap-6">

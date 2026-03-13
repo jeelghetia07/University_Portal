@@ -7,7 +7,7 @@ const Announcements = () => {
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [selectedAnnouncement, setSelectedAnnouncement] = useState(null);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
-  const [pinnedIds, setPinnedIds] = useState([1]); // First announcement pinned by default
+  const [pinnedIds] = useState([1]); // Admin-controlled pinned announcements
 
   const categories = ["All", "Academic", "Events", "General"];
 
@@ -53,14 +53,6 @@ const Announcements = () => {
         return "📢";
       default:
         return "📌";
-    }
-  };
-
-  const togglePin = (id) => {
-    if (pinnedIds.includes(id)) {
-      setPinnedIds(pinnedIds.filter((pid) => pid !== id));
-    } else {
-      setPinnedIds([...pinnedIds, id]);
     }
   };
 
@@ -120,7 +112,7 @@ const Announcements = () => {
               className={`px-4 py-2 rounded-lg font-medium transition-all ${
                 selectedCategory === cat
                   ? "bg-blue-600 text-white shadow-md"
-                  : "bg-slate-100 text-slate-700 hover:bg-slate-200"
+                  : "bg-slate-100 text-slate-900 hover:bg-slate-600"
               }`}
             >
               {cat}
@@ -142,7 +134,7 @@ const Announcements = () => {
             {pinnedAnnouncements.map((announcement) => (
               <div
                 key={announcement.id}
-                className="border-2 border-indigo-200 bg-indigo-50 rounded-lg p-4 hover:shadow-md transition-all cursor-pointer"
+                className="border-2 border-indigo-200 dark:border-slate-600 bg-indigo-50 dark:bg-slate-800 rounded-lg p-4 hover:shadow-md transition-all cursor-pointer"
                 onClick={() => openDetails(announcement)}
               >
                 <div className="flex items-start justify-between">
@@ -160,7 +152,7 @@ const Announcements = () => {
                         >
                           {announcement.priority.toUpperCase()}
                         </span>
-                        <span className="text-xs bg-slate-200 text-slate-700 px-2 py-1 rounded-full font-medium">
+                        <span className="text-xs bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 px-2 py-1 rounded-full font-medium">
                           {announcement.category}
                         </span>
                       </div>
@@ -182,15 +174,6 @@ const Announcements = () => {
                       </p>
                     </div>
                   </div>
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      togglePin(announcement.id);
-                    }}
-                    className="ml-3 p-2 text-indigo-600 hover:bg-indigo-100 rounded-lg transition-all"
-                  >
-                    <Pin className="w-5 h-5 fill-current" />
-                  </button>
                 </div>
               </div>
             ))}
@@ -249,15 +232,6 @@ const Announcements = () => {
                     </div>
                   </div>
                 </div>
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    togglePin(announcement.id);
-                  }}
-                  className="ml-3 p-2 text-slate-400 hover:text-indigo-600 hover:bg-slate-100 rounded-lg transition-all"
-                >
-                  <Pin className="w-5 h-5" />
-                </button>
               </div>
             </div>
           ))}

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Award, TrendingUp, BookOpen, Download, ChevronDown } from 'lucide-react';
+import { Award, TrendingUp, BookOpen, ChevronDown } from 'lucide-react';
 import { gradesData } from '../data/mockData';
 
 const Grades = () => {
@@ -118,9 +118,9 @@ const Grades = () => {
         </div>
       </div>
 
-      {/* Semester Selector & Download */}
+      {/* Semester Selector */}
       <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="flex flex-col md:flex-row md:items-center gap-4">
           <div className="flex items-center space-x-3">
             <label className="text-sm font-medium text-slate-700">View Semester:</label>
             <div className="relative">
@@ -138,11 +138,6 @@ const Grades = () => {
               <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400 pointer-events-none" />
             </div>
           </div>
-
-          <button className="flex items-center space-x-2 px-4 py-2 bg-purple-50 text-purple-600 rounded-lg hover:bg-purple-100 transition-all">
-            <Download className="w-4 h-4" />
-            <span className="font-semibold">Download Transcript</span>
-          </button>
         </div>
       </div>
 
@@ -167,7 +162,7 @@ const Grades = () => {
               </thead>
               <tbody>
                 {normalizedCurrentSemester.map((course, index) => (
-                  <tr key={index} className="border-b border-slate-100 hover:bg-slate-50 transition-all">
+                  <tr key={index} className="border-b border-slate-100">
                     <td className="p-4">
                       <div>
                         <p className="font-medium text-slate-900">{course.course}</p>
@@ -235,23 +230,6 @@ const Grades = () => {
             ))}
           </div>
 
-          {/* Summary */}
-          <div className="mt-6 pt-6 border-t border-slate-200">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="bg-slate-50 rounded-lg p-4">
-                <p className="text-sm text-slate-600 mb-1">Total Credits</p>
-                <p className="text-2xl font-bold text-slate-900">{totalCredits}</p>
-              </div>
-              <div className="bg-green-50 rounded-lg p-4">
-                <p className="text-sm text-green-700 mb-1">Semester GPA</p>
-                <p className="text-2xl font-bold text-green-600">{currentSGPA}</p>
-              </div>
-              <div className="bg-purple-50 rounded-lg p-4">
-                <p className="text-sm text-purple-700 mb-1">Cumulative GPA</p>
-                <p className="text-2xl font-bold text-purple-600">{gradesData.cgpa}</p>
-              </div>
-            </div>
-          </div>
         </div>
       )}
 

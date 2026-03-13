@@ -8,9 +8,17 @@ const Exams = () => {
   // Calculate countdown to next exam
   useEffect(() => {
     const nextExam = examSchedule[0];
-    const examDateTime = new Date(nextExam.date + ' ' + nextExam.time.split(' - ')[0]);
+    const [year, month, day] = nextExam.date.split('-').map(Number);
+    const [timePart, meridiem] = nextExam.time.split(' - ')[0].split(' ');
+    const [rawHours, rawMinutes] = timePart.split(':').map(Number);
+    let hours = rawHours;
 
-    const timer = setInterval(() => {
+    if (meridiem === 'PM' && hours !== 12) hours += 12;
+    if (meridiem === 'AM' && hours === 12) hours = 0;
+
+    const examDateTime = new Date(year, month - 1, day, hours, rawMinutes);
+
+    const updateCountdown = () => {
       const now = new Date();
       const difference = examDateTime - now;
 
@@ -20,8 +28,13 @@ const Exams = () => {
         const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
 
         setCountdown({ days, hours, minutes });
+      } else {
+        setCountdown({ days: 0, hours: 0, minutes: 0 });
       }
-    }, 60000); // Update every minute
+    };
+
+    updateCountdown();
+    const timer = setInterval(updateCountdown, 60000);
 
     return () => clearInterval(timer);
   }, []);
@@ -45,16 +58,16 @@ const Exams = () => {
       </div>
 
       {/* Countdown Card */}
-      <div className="bg-gradient-to-br from-red-50 to-pink-50 border-2 border-red-200 rounded-xl p-6">
+      <div className="bg-gradient-to-br from-red-50 to-pink-50 dark:from-slate-900 dark:to-slate-800 border-2 border-red-200 dark:border-slate-700 rounded-xl p-6">
         <div className="flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="flex items-center space-x-4">
-            <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center">
-              <AlertCircle className="w-8 h-8 text-red-600" />
+            <div className="w-16 h-16 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center">
+              <AlertCircle className="w-8 h-8 text-red-600 dark:text-red-300" />
             </div>
             <div>
-              <h2 className="text-2xl font-bold text-slate-900">Next Exam</h2>
-              <p className="text-slate-700">{examSchedule[0].course}</p>
-              <p className="text-sm text-slate-600">
+              <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100">Next Exam</h2>
+              <p className="text-slate-700 dark:text-slate-200">{examSchedule[0].course}</p>
+              <p className="text-sm text-slate-600 dark:text-slate-400">
                 {new Date(examSchedule[0].date).toLocaleDateString('en-US', {
                   weekday: 'long',
                   year: 'numeric',
@@ -66,15 +79,15 @@ const Exams = () => {
           </div>
 
           <div className="flex space-x-4">
-            <div className="text-center bg-white rounded-lg p-4 min-w-[80px] shadow-sm">
+            <div className="text-center bg-white dark:bg-slate-800 rounded-lg p-4 min-w-[80px] shadow-sm">
               <p className="text-3xl font-bold text-red-600">{countdown.days}</p>
               <p className="text-xs text-slate-600">Days</p>
             </div>
-            <div className="text-center bg-white rounded-lg p-4 min-w-[80px] shadow-sm">
+            <div className="text-center bg-white dark:bg-slate-800 rounded-lg p-4 min-w-[80px] shadow-sm">
               <p className="text-3xl font-bold text-red-600">{countdown.hours}</p>
               <p className="text-xs text-slate-600">Hours</p>
             </div>
-            <div className="text-center bg-white rounded-lg p-4 min-w-[80px] shadow-sm">
+            <div className="text-center bg-white dark:bg-slate-800 rounded-lg p-4 min-w-[80px] shadow-sm">
               <p className="text-3xl font-bold text-red-600">{countdown.minutes}</p>
               <p className="text-xs text-slate-600">Minutes</p>
             </div>
@@ -118,7 +131,7 @@ const Exams = () => {
             </thead>
             <tbody>
               {examSchedule.map((exam, index) => (
-                <tr key={index} className="border-b border-slate-100 hover:bg-slate-50 transition-all">
+                <tr key={index} className="border-b border-slate-100">
                   <td className="p-4">
                     <p className="font-semibold text-slate-900">{exam.course}</p>
                   </td>

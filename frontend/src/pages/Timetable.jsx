@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Calendar, Clock, MapPin, User, Download, Filter } from "lucide-react";
+import { Calendar, Clock, MapPin, User, Filter } from "lucide-react";
 import { timetable } from "../data/mockData";
 
 const Timetable = () => {
@@ -35,20 +35,8 @@ const Timetable = () => {
   return daySchedule.classes.find((c) => c.time.startsWith(slotStartTime));
 };
 
-  // Color mapping for courses
-  const courseColors = {
-    "Data Structures": "bg-indigo-100 border-indigo-300 text-indigo-900",
-    DBMS: "bg-purple-100 border-purple-300 text-purple-900",
-    "Operating Systems": "bg-pink-100 border-pink-300 text-pink-900",
-    "Computer Networks": "bg-blue-100 border-blue-300 text-blue-900",
-    "Software Engineering": "bg-green-100 border-green-300 text-green-900",
-  };
-
-  const getColorClass = (courseName) => {
-    return (
-      courseColors[courseName] || "bg-slate-100 border-slate-300 text-slate-900"
-    );
-  };
+  const timetableCardClass =
+    "bg-slate-50 dark:bg-slate-800 border-slate-300 dark:border-slate-600 text-slate-900 dark:text-slate-100";
 
   // Filter timetable by selected day
   const filteredTimetable =
@@ -110,11 +98,6 @@ const Timetable = () => {
             </div>
           )}
 
-          {/* Download Button */}
-          <button className="flex items-center space-x-2 px-4 py-2 bg-indigo-50 text-indigo-600 rounded-lg hover:bg-indigo-100 transition-all">
-            <Download className="w-4 h-4" />
-            <span className="font-semibold">Download</span>
-          </button>
         </div>
       </div>
 
@@ -150,7 +133,7 @@ const Timetable = () => {
               {timeSlots.map((slot, index) => (
                 <tr
                   key={slot}
-                  className="border-b border-slate-100 hover:bg-slate-50"
+                  className="border-b border-slate-100"
                 >
                   <td className="p-4 text-sm text-slate-600 font-medium">
                     {slot.split(" - ")[0]}
@@ -161,7 +144,7 @@ const Timetable = () => {
                       <td key={day.day} className="p-2">
                         {classItem ? (
                           <div
-                            className={`rounded-lg p-3 border-2 ${getColorClass(classItem.course)} hover:shadow-md transition-all cursor-pointer`}
+                            className={`rounded-lg p-3 border-2 ${timetableCardClass}`}
                           >
                             <p className="font-semibold text-sm mb-1">
                               {classItem.course}
@@ -234,7 +217,7 @@ const Timetable = () => {
                   {day.classes.map((classItem, index) => (
                     <div
                       key={index}
-                      className={`rounded-lg p-4 border-2 ${getColorClass(classItem.course)} hover:shadow-lg transition-all`}
+                      className={`rounded-lg p-4 border-2 ${timetableCardClass}`}
                     >
                       <div className="flex items-start justify-between">
                         <div className="flex-1">
@@ -274,18 +257,6 @@ const Timetable = () => {
         </div>
       )}
 
-      {/* Legend */}
-      <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
-        <h3 className="font-semibold text-slate-900 mb-4">Color Legend</h3>
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
-          {Object.entries(courseColors).map(([course, colorClass]) => (
-            <div key={course} className="flex items-center space-x-2">
-              <div className={`w-4 h-4 rounded ${colorClass} border-2`}></div>
-              <span className="text-sm text-slate-700">{course}</span>
-            </div>
-          ))}
-        </div>
-      </div>
     </div>
   );
 };

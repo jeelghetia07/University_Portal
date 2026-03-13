@@ -1,10 +1,12 @@
 import { useState } from 'react';
-import { Settings as SettingsIcon, Bell, Moon, Sun, Info, Lock, X, Mail, Smartphone, Download } from 'lucide-react';
+import { Settings as SettingsIcon, Bell, Moon, Sun, Info, Lock, X, Mail, Smartphone } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
+import PasswordResetModal from '../components/auth/PasswordResetModal';
 
 const Settings = () => {
   const { theme, setTheme, activeTheme } = useTheme();
   const [showPasswordModal, setShowPasswordModal] = useState(false);
+  const [showResetModal, setShowResetModal] = useState(false);
   const [passwordData, setPasswordData] = useState({
     currentPassword: '',
     newPassword: '',
@@ -56,12 +58,13 @@ const Settings = () => {
     });
   };
 
-  const handleDownloadData = () => {
-    alert('Downloading your data... (Demo mode)');
-  };
-
   const handleThemeChange = (newTheme) => {
     setTheme(newTheme);
+  };
+
+  const openResetModal = () => {
+    setShowPasswordModal(false);
+    setShowResetModal(true);
   };
 
   return (
@@ -261,30 +264,6 @@ const Settings = () => {
         </div>
       </div>
 
-      {/* Data Management */}
-      <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 p-6">
-        <div className="flex items-center space-x-3 mb-6">
-          <div className="w-10 h-10 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center">
-            <Download className="w-5 h-5 text-blue-600 dark:text-blue-400" />
-          </div>
-          <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100">Data Management</h2>
-        </div>
-
-        <button
-          onClick={handleDownloadData}
-          className="w-full flex items-center justify-between p-4 border border-slate-200 dark:border-slate-700 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition-all"
-        >
-          <div className="flex items-center space-x-3">
-            <Download className="w-5 h-5 text-slate-600 dark:text-slate-300" />
-            <div className="text-left">
-              <p className="font-medium text-slate-900 dark:text-slate-100">Download My Data</p>
-              <p className="text-sm text-slate-600 dark:text-slate-400">Get a copy of your academic information</p>
-            </div>
-          </div>
-          <span className="text-slate-400">&rarr;</span>
-        </button>
-      </div>
-
       {/* About */}
       <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 p-6">
         <div className="flex items-center space-x-3 mb-6">
@@ -339,6 +318,13 @@ const Settings = () => {
                     className="w-full pl-10 pr-4 py-3 border border-slate-300 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100"
                   />
                 </div>
+                <button
+                  type="button"
+                  onClick={openResetModal}
+                  className="mt-3 text-sm font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 transition-all"
+                >
+                  Forgot current password?
+                </button>
               </div>
 
               {/* New Password */}
@@ -399,6 +385,12 @@ const Settings = () => {
           </div>
         </div>
       )}
+
+      <PasswordResetModal
+        isOpen={showResetModal}
+        onClose={() => setShowResetModal(false)}
+        successButtonLabel="Back to Settings"
+      />
     </div>
   );
 };
