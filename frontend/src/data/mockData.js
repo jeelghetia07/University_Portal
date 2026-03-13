@@ -689,11 +689,11 @@ export const courseMaterials = {
 };
 
 export const examSchedule = [
-  { course: "Data Structures", code: "CS301", date: "2025-03-15", time: "9:00 AM - 12:00 PM", room: "Exam Hall A" },
-  { course: "DBMS", code: "CS302", date: "2025-03-18", time: "2:00 PM - 5:00 PM", room: "Exam Hall B" },
-  { course: "Operating Systems", code: "CS303", date: "2025-03-20", time: "9:00 AM - 12:00 PM", room: "Exam Hall A" },
-  { course: "Computer Networks", code: "CS304", date: "2025-03-22", time: "2:00 PM - 5:00 PM", room: "Exam Hall C" },
-  { course: "Software Engineering", code: "CS305", date: "2025-03-25", time: "9:00 AM - 12:00 PM", room: "Exam Hall B" }
+  { course: "Data Structures", code: "CS301", date: "2026-12-01", time: "9:00 AM - 12:00 PM", room: "Exam Hall A" },
+  { course: "DBMS", code: "CS302", date: "2026-12-03", time: "2:00 PM - 5:00 PM", room: "Exam Hall B" },
+  { course: "Operating Systems", code: "CS303", date: "2026-12-05", time: "9:00 AM - 12:00 PM", room: "Exam Hall A" },
+  { course: "Computer Networks", code: "CS304", date: "2026-12-08", time: "2:00 PM - 5:00 PM", room: "Exam Hall C" },
+  { course: "Software Engineering", code: "CS305", date: "2026-12-10", time: "9:00 AM - 12:00 PM", room: "Exam Hall B" }
 ];
 
 export const events = [
