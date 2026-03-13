@@ -89,6 +89,45 @@ body {
   color: rgb(100 116 139);
 }
 
+/* Login and signup should stay in their original light treatment */
+.dark .auth-page .bg-white {
+  background-color: rgb(255 255 255);
+}
+
+.dark .auth-page .border-slate-200 {
+  border-color: rgb(226 232 240);
+}
+
+.dark .auth-page .border-slate-300 {
+  border-color: rgb(203 213 225);
+}
+
+.dark .auth-page .text-slate-900 {
+  color: rgb(15 23 42);
+}
+
+.dark .auth-page .text-slate-700 {
+  color: rgb(51 65 85);
+}
+
+.dark .auth-page .text-slate-600,
+.dark .auth-page .text-slate-500 {
+  color: rgb(71 85 105);
+}
+
+.dark .auth-page input,
+.dark .auth-page select,
+.dark .auth-page textarea {
+  background-color: rgb(255 255 255);
+  color: rgb(15 23 42);
+  border-color: rgb(203 213 225);
+}
+
+.dark .auth-page input::placeholder,
+.dark .auth-page textarea::placeholder {
+  color: rgb(100 116 139);
+}
+
 /* Custom Animations */
 @keyframes fadeIn {
   from {
