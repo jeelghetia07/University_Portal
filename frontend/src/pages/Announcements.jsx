@@ -1,13 +1,13 @@
 import { useState } from "react";
 import { Bell, Search, Filter, Pin, X, Calendar } from "lucide-react";
-import { announcements } from "../data/mockData";
+import { useAdmin } from "../context/AdminContext";
 
 const Announcements = () => {
+  const { announcements } = useAdmin();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [selectedAnnouncement, setSelectedAnnouncement] = useState(null);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
-  const [pinnedIds] = useState([1]); // Admin-controlled pinned announcements
 
   const categories = ["All", "Academic", "Events", "General"];
 
@@ -19,16 +19,12 @@ const Announcements = () => {
     const matchesCategory =
       selectedCategory === "All" || announcement.category === selectedCategory;
 
-    return matchesSearch && matchesCategory;
+    return matchesSearch && matchesCategory && !announcement.archived;
   });
 
   // Separate pinned and unpinned
-  const pinnedAnnouncements = filteredAnnouncements.filter((a) =>
-    pinnedIds.includes(a.id),
-  );
-  const unpinnedAnnouncements = filteredAnnouncements.filter(
-    (a) => !pinnedIds.includes(a.id),
-  );
+  const pinnedAnnouncements = filteredAnnouncements.filter((a) => a.pinned);
+  const unpinnedAnnouncements = filteredAnnouncements.filter((a) => !a.pinned);
 
   const getPriorityColor = (priority) => {
     if (priority === "high") return "bg-red-100 text-red-700 border-red-300";

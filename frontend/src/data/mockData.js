@@ -688,6 +688,79 @@ export const courseMaterials = {
   ]
 };
 
+export const assignmentsData = [
+  {
+    id: 1,
+    title: 'Assignment 1 - Arrays and Linked Lists',
+    courseCode: 'CS301',
+    courseName: 'Data Structures and Algorithms',
+    faculty: 'Dr. Anjali Mehta',
+    postedDate: '2026-03-01',
+    deadline: '2026-03-20',
+    maxMarks: 20,
+    description: 'Solve the linked list reversal, stack implementation, and circular queue problems from the uploaded sheet.',
+    questionFile: 'CS301_Assignment1.pdf',
+    allowedTypes: ['PDF', 'DOCX'],
+    status: 'Pending',
+    submission: null
+  },
+  {
+    id: 2,
+    title: 'Assignment 2 - SQL Query Writing',
+    courseCode: 'CS302',
+    courseName: 'Database Management Systems',
+    faculty: 'Prof. Rajesh Kumar',
+    postedDate: '2026-02-26',
+    deadline: '2026-03-18',
+    maxMarks: 25,
+    description: 'Write optimized SQL queries for joins, nested subqueries, and aggregate reporting using the provided schema.',
+    questionFile: 'CS302_Assignment2.pdf',
+    allowedTypes: ['PDF', 'DOCX'],
+    status: 'Submitted',
+    submission: {
+      fileName: 'DBMS_Assignment_Jeel.pdf',
+      submittedAt: '2026-03-12 07:30 PM',
+      marks: null,
+      feedback: 'Awaiting faculty review'
+    }
+  },
+  {
+    id: 3,
+    title: 'Assignment 1 - Process Scheduling Case Study',
+    courseCode: 'CS303',
+    courseName: 'Operating Systems',
+    faculty: 'Dr. Priya Patel',
+    postedDate: '2026-02-22',
+    deadline: '2026-03-10',
+    maxMarks: 15,
+    description: 'Compare FCFS, SJF, and Round Robin scheduling using the given process set and explain turnaround time differences.',
+    questionFile: 'CS303_Assignment1.pdf',
+    allowedTypes: ['PDF'],
+    status: 'Graded',
+    submission: {
+      fileName: 'OS_Scheduling_Assignment.pdf',
+      submittedAt: '2026-03-08 05:10 PM',
+      marks: 13,
+      feedback: 'Good explanation. Add cleaner Gantt chart formatting next time.'
+    }
+  },
+  {
+    id: 4,
+    title: 'Assignment 1 - Network Topologies Report',
+    courseCode: 'CS304',
+    courseName: 'Computer Networks',
+    faculty: 'Prof. Amit Verma',
+    postedDate: '2026-02-20',
+    deadline: '2026-03-05',
+    maxMarks: 10,
+    description: 'Prepare a short comparative report on star, mesh, and ring topologies with real-world use cases.',
+    questionFile: 'CS304_Assignment1.pdf',
+    allowedTypes: ['PDF', 'PPT'],
+    status: 'Overdue',
+    submission: null
+  }
+];
+
 export const examSchedule = [
   { course: "Data Structures", code: "CS301", date: "2026-12-01", time: "9:00 AM - 12:00 PM", room: "Exam Hall A" },
   { course: "DBMS", code: "CS302", date: "2026-12-03", time: "2:00 PM - 5:00 PM", room: "Exam Hall B" },

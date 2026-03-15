@@ -10,6 +10,8 @@ import {
   CheckCircle,
 } from 'lucide-react';
 import PasswordResetModal from '../components/auth/PasswordResetModal';
+import { useTheme } from '../context/ThemeContext';
+import { findMockAuthUser, getDefaultRouteForRole } from '../data/authMockData';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -20,6 +22,7 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const [showForgotPasswordModal, setShowForgotPasswordModal] = useState(false);
+  const { setRole } = useTheme();
   const navigate = useNavigate();
 
   const syncSignupState = () => {
@@ -60,7 +63,7 @@ const Login = () => {
     };
   }, []);
 
-  const validateEmail = (value) => {
+  const validateStudentEmail = (value) => {
     if (!value.endsWith('@university.edu')) {
       return { valid: false, message: 'Please use your university email (@university.edu)' };
     }
@@ -99,42 +102,56 @@ const Login = () => {
       return;
     }
 
-    const emailValidation = validateEmail(email);
-    if (!emailValidation.valid) {
-      setError(emailValidation.message);
+    const mockUser = findMockAuthUser(email);
+    const signupEmail = localStorage.getItem('signupEmail');
+    const signupPassword = localStorage.getItem('signupPassword');
+    const fallbackSignupUser =
+      signupEmail && signupEmail.toLowerCase() === email.toLowerCase()
+        ? {
+            id: localStorage.getItem('signupRollNumber') || email.split('@')[0].toUpperCase(),
+            name: localStorage.getItem('signupName') || email.split('@')[0].toUpperCase(),
+            email: signupEmail,
+            password: signupPassword || '',
+            role: 'student',
+            department: localStorage.getItem('signupDepartment') || 'Computer Science',
+            profilePic: '',
+          }
+        : null;
+    const userRecord = mockUser || fallbackSignupUser;
+
+    if (!userRecord) {
+      setError('No mock account found for this email');
       setLoading(false);
       return;
     }
 
     setTimeout(() => {
-      const rollNumber = email.split('@')[0].toUpperCase();
+      if (password !== userRecord.password) {
+        setError('Incorrect password for this mock account');
+        setLoading(false);
+        return;
+      }
 
-      const getDepartmentFromRollNumber = (value) => {
-        if (!value || value.length < 5) return 'Computer Science';
-
-        const deptCode = value.substring(3, 5).toUpperCase();
-        const deptMap = {
-          CP: 'Computer Science',
-          IT: 'Information Technology',
-          EC: 'Electronics & Communication',
-          CV: 'Civil Engineering',
-          ME: 'Mechanical Engineering',
-          EE: 'Electrical Engineering',
-        };
-
-        return deptMap[deptCode] || 'Computer Science';
-      };
-
-      const department = getDepartmentFromRollNumber(rollNumber);
+      if (userRecord.role === 'student') {
+        const emailValidation = validateStudentEmail(email);
+        if (!emailValidation.valid) {
+          setError(emailValidation.message);
+          setLoading(false);
+          return;
+        }
+      }
 
       localStorage.setItem('authToken', 'dummy-token-12345');
       localStorage.setItem('userEmail', email);
-      localStorage.setItem('userRollNumber', rollNumber);
-      localStorage.setItem('userDepartment', department);
-      localStorage.setItem('userName', rollNumber);
+      localStorage.setItem('userRole', userRecord.role);
+      localStorage.setItem('userName', userRecord.name);
+      localStorage.setItem('userDepartment', userRecord.department);
+      localStorage.setItem('userProfilePic', userRecord.profilePic || '');
+      localStorage.setItem('userRollNumber', userRecord.id);
+      setRole(userRecord.role);
 
       setLoading(false);
-      navigate('/dashboard');
+      navigate(getDefaultRouteForRole(userRecord.role));
     }, 1000);
   };
 
@@ -163,7 +180,7 @@ const Login = () => {
             <BookOpen className="w-8 h-8 text-indigo-600" />
           </div>
           <h1 className="text-4xl font-bold text-white mb-2">UniPortal</h1>
-          <p className="text-indigo-100">Student Portal Login</p>
+          <p className="text-indigo-100">Role-based portal login</p>
         </div>
 
         {showSuccessMessage && (
@@ -184,6 +201,9 @@ const Login = () => {
           <div className="mb-6">
             <h2 className="text-2xl font-bold text-slate-900">Welcome back!</h2>
             <p className="text-slate-600 mt-1">Please login to your account</p>
+            <p className="text-xs text-slate-500 mt-2">
+              Demo accounts: `admin@university.edu`, `24BCP001@university.edu`, `anjali.mehta@university.edu`
+            </p>
           </div>
 
           {error && (

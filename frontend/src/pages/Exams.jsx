@@ -1,12 +1,18 @@
 import { useState, useEffect } from 'react';
 import { FileText, Download, Calendar, Clock, MapPin, AlertCircle, CheckCircle } from 'lucide-react';
-import { examSchedule } from '../data/mockData';
+import { useAdmin } from '../context/AdminContext';
 
 const Exams = () => {
+  const { examSchedule } = useAdmin();
   const [countdown, setCountdown] = useState({ days: 0, hours: 0, minutes: 0 });
 
   // Calculate countdown to next exam
   useEffect(() => {
+    if (!examSchedule.length) {
+      setCountdown({ days: 0, hours: 0, minutes: 0 });
+      return undefined;
+    }
+
     const nextExam = examSchedule[0];
     const [year, month, day] = nextExam.date.split('-').map(Number);
     const [timePart, meridiem] = nextExam.time.split(' - ')[0].split(' ');
@@ -37,7 +43,7 @@ const Exams = () => {
     const timer = setInterval(updateCountdown, 60000);
 
     return () => clearInterval(timer);
-  }, []);
+  }, [examSchedule]);
 
   const handleDownloadAdmitCard = () => {
     // Backend API call will go here
@@ -59,6 +65,7 @@ const Exams = () => {
 
       {/* Countdown Card */}
       <div className="bg-gradient-to-br from-red-50 to-pink-50 dark:from-slate-900 dark:to-slate-800 border-2 border-red-200 dark:border-slate-700 rounded-xl p-6">
+        {examSchedule.length > 0 ? (
         <div className="flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="flex items-center space-x-4">
             <div className="w-16 h-16 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center">
@@ -93,6 +100,12 @@ const Exams = () => {
             </div>
           </div>
         </div>
+        ) : (
+          <div className="text-center py-4">
+            <p className="text-lg font-semibold text-slate-900 dark:text-slate-100">No exams scheduled yet</p>
+            <p className="text-sm text-slate-600 dark:text-slate-400 mt-2">Admin can publish the examination schedule from the admin portal.</p>
+          </div>
+        )}
       </div>
 
       {/* Download Buttons */}
@@ -131,7 +144,7 @@ const Exams = () => {
             </thead>
             <tbody>
               {examSchedule.map((exam, index) => (
-                <tr key={index} className="border-b border-slate-100">
+                <tr key={exam.id || index} className="border-b border-slate-100">
                   <td className="p-4">
                     <p className="font-semibold text-slate-900">{exam.course}</p>
                   </td>
@@ -169,7 +182,7 @@ const Exams = () => {
         {/* Mobile Cards */}
         <div className="md:hidden space-y-4">
           {examSchedule.map((exam, index) => (
-            <div key={index} className="border border-slate-200 rounded-lg p-4">
+            <div key={exam.id || index} className="border border-slate-200 rounded-lg p-4">
               <div className="flex items-start justify-between mb-3">
                 <div>
                   <h3 className="font-semibold text-slate-900">{exam.course}</h3>

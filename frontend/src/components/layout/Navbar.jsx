@@ -9,10 +9,12 @@ import {
   ChevronDown,
 } from "lucide-react";
 import { currentUser } from "../../data/mockData";
+import { useTheme } from "../../context/ThemeContext";
 
 const Navbar = ({ toggleSidebar }) => {
   const [showNotifications, setShowNotifications] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
+  const { setRole } = useTheme();
   const navigate = useNavigate();
 
   const notifications = [
@@ -32,10 +34,19 @@ const Navbar = ({ toggleSidebar }) => {
   ];
 
   const unreadCount = notifications.filter((n) => n.unread).length;
+  const userName = localStorage.getItem("userName") || currentUser.name;
+  const userEmail = localStorage.getItem("userEmail") || currentUser.email;
+  const userProfilePic = localStorage.getItem("userProfilePic") || currentUser.profilePic;
 
   const handleLogout = () => {
-    // Clear any stored data
-    localStorage.clear();
+    localStorage.removeItem("authToken");
+    localStorage.removeItem("userEmail");
+    localStorage.removeItem("userRole");
+    localStorage.removeItem("userName");
+    localStorage.removeItem("userDepartment");
+    localStorage.removeItem("userProfilePic");
+    localStorage.removeItem("userRollNumber");
+    setRole("student");
     navigate("/");
   };
 
@@ -120,13 +131,13 @@ const Navbar = ({ toggleSidebar }) => {
                 className="flex items-center space-x-3 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg px-3 py-2 transition-all group"
               >
                 <img
-                  src={currentUser.profilePic}
-                  alt={currentUser.name}
+                  src={userProfilePic}
+                  alt={userName}
                   className="w-8 h-8 rounded-full ring-2 ring-slate-200 dark:ring-slate-700 group-hover:ring-indigo-500 transition-all"
                 />
                 <div className="hidden md:block text-left">
                   <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">
-                    {currentUser.name}
+                    {userName}
                   </p>
                   <p className="text-xs text-slate-500 dark:text-slate-400">
                     {localStorage.getItem("userDepartment") ||
@@ -141,10 +152,10 @@ const Navbar = ({ toggleSidebar }) => {
                 <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-slate-900 rounded-lg shadow-xl border border-slate-200 dark:border-slate-700 py-2 animate-fadeIn">
                   <div className="px-4 py-3 border-b border-slate-200 dark:border-slate-700">
                     <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">
-                      {currentUser.name}
+                      {userName}
                     </p>
                     <p className="text-xs text-slate-500 dark:text-slate-400">
-                      {currentUser.email}
+                      {userEmail}
                     </p>
                   </div>
 

@@ -74,6 +74,7 @@ const Signup = () => {
       // Store signup info in localStorage
       localStorage.setItem("signupEmail", formData.email);
       localStorage.setItem("signupRecoveryEmail", formData.recoveryEmail);
+      localStorage.setItem("signupPassword", formData.password);
       localStorage.setItem("signupName", formData.name);
       localStorage.setItem("justSignedUp", "true");
 
