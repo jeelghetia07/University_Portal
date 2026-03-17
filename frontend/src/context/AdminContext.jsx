@@ -49,13 +49,9 @@ const buildInitialState = () => {
   ];
 
   const courses = availableCourses.map((course) => ({
-    id: course.id,
-    courseCode: course.courseCode,
-    courseName: course.courseName,
-    credits: course.credits,
+    ...course,
     seats: course.capacity,
-    department: course.department,
-    semester: course.semester,
+    courseType: course.courseType || 'core',
   }));
 
   const sections = [
@@ -134,9 +130,19 @@ const getStoredState = () => {
 
   try {
     const parsed = JSON.parse(stored);
+    const normalizedCourses = (parsed.courses || initialState.courses).map((course) => {
+      const matchingInitialCourse = initialState.courses.find((item) => item.id === course.id);
+      return {
+        ...matchingInitialCourse,
+        ...course,
+        courseType: course.courseType || matchingInitialCourse?.courseType || 'core',
+        seats: Number(course.seats ?? matchingInitialCourse?.seats ?? 0),
+      };
+    });
     return {
       ...initialState,
       ...parsed,
+      courses: normalizedCourses,
     };
   } catch {
     return initialState;
@@ -173,8 +179,22 @@ export const AdminProvider = ({ children }) => {
     persist(nextState);
   };
 
+  const deleteUser = (userId) => {
+    const nextState = {
+      ...state,
+      users: state.users.filter((user) => user.id !== userId),
+    };
+    persist(nextState);
+  };
+
   const saveCourse = (course) => {
-    const nextState = { ...state, courses: upsertById(state.courses, course) };
+    const nextState = {
+      ...state,
+      courses: upsertById(state.courses, {
+        ...course,
+        courseType: course.courseType || 'core',
+      }),
+    };
     persist(nextState);
   };
 
@@ -284,6 +304,7 @@ export const AdminProvider = ({ children }) => {
       gradeStats: gradesData,
       saveUser,
       toggleUserStatus,
+      deleteUser,
       saveCourse,
       saveSection,
       saveFacultyAssignment,
