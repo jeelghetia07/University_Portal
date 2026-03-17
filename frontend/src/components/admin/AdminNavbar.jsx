@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Menu, Bell, LogOut, ChevronDown, Settings } from 'lucide-react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useTheme } from '../../context/ThemeContext';
+import { AvatarWithFallback } from '../common/Avatar';
 
 const AdminNavbar = ({ toggleSidebar }) => {
   const [openProfile, setOpenProfile] = useState(false);
@@ -10,7 +11,7 @@ const AdminNavbar = ({ toggleSidebar }) => {
 
   const adminName = localStorage.getItem('userName') || 'Admin';
   const adminEmail = localStorage.getItem('userEmail') || 'admin@university.edu';
-  const adminAvatar = localStorage.getItem('userProfilePic') || 'https://ui-avatars.com/api/?name=Admin&background=f59e0b&color=fff';
+  const adminAvatar = localStorage.getItem('userProfilePic') || '';
 
   const handleLogout = () => {
     localStorage.removeItem('authToken');
@@ -40,17 +41,17 @@ const AdminNavbar = ({ toggleSidebar }) => {
         </div>
 
         <div className="flex items-center gap-3 ml-auto">
-          <button className="relative p-2 rounded-lg text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all">
-            <Bell className="w-5 h-5" />
-            <span className="absolute top-1 right-1 w-2 h-2 bg-orange-500 rounded-full" />
-          </button>
-
           <div className="relative">
             <button
               onClick={() => setOpenProfile((value) => !value)}
               className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-all"
             >
-              <img src={adminAvatar} alt={adminName} className="w-8 h-8 rounded-full object-cover" />
+              <AvatarWithFallback
+                name={adminName}
+                role="admin"
+                imageUrl={adminAvatar}
+                className="w-8 h-8 rounded-full object-cover"
+              />
               <div className="hidden md:block text-left">
                 <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">{adminName}</p>
                 <p className="text-xs text-slate-500 dark:text-slate-400">Administrator</p>
