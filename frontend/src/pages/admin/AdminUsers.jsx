@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { Plus, Pencil, Power, Users } from 'lucide-react';
+import { Plus, Pencil, Power, Trash2, Users } from 'lucide-react';
 import { useAdmin } from '../../context/AdminContext';
 import AdminPageHeader from '../../components/admin/AdminPageHeader';
 
@@ -15,7 +15,7 @@ const emptyUser = {
 };
 
 const AdminUsers = () => {
-  const { users, saveUser, toggleUserStatus } = useAdmin();
+  const { users, saveUser, toggleUserStatus, deleteUser } = useAdmin();
   const [selectedRole, setSelectedRole] = useState('all');
   const [selectedDepartment, setSelectedDepartment] = useState('all');
   const [editingUser, setEditingUser] = useState(null);
@@ -54,6 +54,15 @@ const AdminUsers = () => {
       section: formData.role === 'student' ? formData.section : '-',
     });
     closeModal();
+  };
+
+  const handleDeleteUser = (user) => {
+    const shouldDelete = window.confirm(
+      `Delete ${user.name} from the prototype user list? This is permanent in the current mock state.`
+    );
+
+    if (!shouldDelete) return;
+    deleteUser(user.id);
   };
 
   return (
@@ -123,6 +132,9 @@ const AdminUsers = () => {
                       </button>
                       <button onClick={() => toggleUserStatus(user.id)} className="p-2 rounded-lg border border-slate-300 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all">
                         <Power className="w-4 h-4 text-slate-600 dark:text-slate-300" />
+                      </button>
+                      <button onClick={() => handleDeleteUser(user)} className="p-2 rounded-lg border border-slate-300 dark:border-slate-700 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all">
+                        <Trash2 className="w-4 h-4 text-red-500" />
                       </button>
                     </div>
                   </td>
