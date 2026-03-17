@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import { currentUser } from "../../data/mockData";
 import { useTheme } from "../../context/ThemeContext";
+import { AvatarWithFallback } from "../common/Avatar";
 
 const Navbar = ({ toggleSidebar }) => {
   const [showNotifications, setShowNotifications] = useState(false);
@@ -37,6 +38,7 @@ const Navbar = ({ toggleSidebar }) => {
   const userName = localStorage.getItem("userName") || currentUser.name;
   const userEmail = localStorage.getItem("userEmail") || currentUser.email;
   const userProfilePic = localStorage.getItem("userProfilePic") || currentUser.profilePic;
+  const userRole = localStorage.getItem("userRole") || "student";
 
   const handleLogout = () => {
     localStorage.removeItem("authToken");
@@ -130,10 +132,11 @@ const Navbar = ({ toggleSidebar }) => {
                 onClick={() => setShowProfileMenu(!showProfileMenu)}
                 className="flex items-center space-x-3 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg px-3 py-2 transition-all group"
               >
-                <img
-                  src={userProfilePic}
-                  alt={userName}
-                  className="w-8 h-8 rounded-full ring-2 ring-slate-200 dark:ring-slate-700 group-hover:ring-indigo-500 transition-all"
+                <AvatarWithFallback
+                  name={userName}
+                  role={userRole}
+                  imageUrl={userProfilePic}
+                  className="w-8 h-8 rounded-full ring-2 ring-slate-200 dark:ring-slate-700 group-hover:ring-indigo-500 transition-all object-cover"
                 />
                 <div className="hidden md:block text-left">
                   <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">
