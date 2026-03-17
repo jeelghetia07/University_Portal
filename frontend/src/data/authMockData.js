@@ -8,7 +8,7 @@ export const mockAuthUsers = [
     password: '123456',
     role: 'admin',
     department: 'Administration',
-    profilePic: 'https://ui-avatars.com/api/?name=Aarav+Shah&background=0f172a&color=fff&size=200',
+    profilePic: 'https://ui-avatars.com/api/?name=Aarav+Shah&background=f59e0b&color=fff&size=200',
   },
   {
     id: currentUser.id,
