@@ -8,7 +8,7 @@ import {
   ChevronDown,
   Send
 } from 'lucide-react';
-import { supportTickets as initialTickets } from '../data/mockData';
+import { supportTickets as initialTickets } from '../../data/mockData';
 
 const Support = () => {
   const [tickets, setTickets] = useState(initialTickets);
@@ -313,3 +313,4 @@ const Support = () => {
 };
 
 export default Support;
+

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Calendar, Clock, MapPin, User, Filter } from "lucide-react";
-import { timetable } from "../data/mockData";
+import { timetable } from "../../data/mockData";
 
 const Timetable = () => {
   const [selectedDay, setSelectedDay] = useState("All");
@@ -262,3 +262,4 @@ const Timetable = () => {
 };
 
 export default Timetable;
+
