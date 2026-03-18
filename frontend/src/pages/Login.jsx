@@ -12,6 +12,7 @@ import {
 import PasswordResetModal from '../components/auth/PasswordResetModal';
 import { useTheme } from '../context/ThemeContext';
 import { findMockAuthUser, getDefaultRouteForRole } from '../data/authMockData';
+import { persistAuthSession } from '../utils/authStorage';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -141,13 +142,18 @@ const Login = () => {
         }
       }
 
-      localStorage.setItem('authToken', 'dummy-token-12345');
-      localStorage.setItem('userEmail', email);
-      localStorage.setItem('userRole', userRecord.role);
-      localStorage.setItem('userName', userRecord.name);
-      localStorage.setItem('userDepartment', userRecord.department);
-      localStorage.setItem('userProfilePic', userRecord.profilePic || '');
-      localStorage.setItem('userRollNumber', userRecord.id);
+      persistAuthSession(
+        {
+          authToken: 'dummy-token-12345',
+          userEmail: email,
+          userRole: userRecord.role,
+          userName: userRecord.name,
+          userDepartment: userRecord.department,
+          userProfilePic: userRecord.profilePic || '',
+          userRollNumber: userRecord.id,
+        },
+        rememberMe
+      );
       setRole(userRecord.role);
 
       setLoading(false);

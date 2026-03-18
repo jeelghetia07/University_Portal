@@ -8,20 +8,20 @@ import Layout from './components/layout/Layout';
 import AdminLayout from './components/admin/AdminLayout';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
-import Dashboard from './pages/Dashboard';
-import CourseRegistration from './pages/CourseRegistration';
-import MyCourses from './pages/MyCourses';
-import Timetable from './pages/Timetable';
-import Profile from './pages/Profile';
-import Grades from './pages/Grades';
-import Fees from './pages/Fees';
-import CourseMaterials from './pages/CourseMaterials';
-import Exams from './pages/Exams';
-import Events from './pages/Events';
-import Announcements from './pages/Announcements';
-import Settings from './pages/Settings';
-import Support from './pages/Support';
-import Assignments from './pages/Assignments';
+import Dashboard from './pages/student/Dashboard';
+import CourseRegistration from './pages/student/CourseRegistration';
+import MyCourses from './pages/student/MyCourses';
+import Timetable from './pages/student/Timetable';
+import Profile from './pages/student/Profile';
+import Grades from './pages/student/Grades';
+import Fees from './pages/student/Fees';
+import CourseMaterials from './pages/student/CourseMaterials';
+import Exams from './pages/student/Exams';
+import Events from './pages/student/Events';
+import Announcements from './pages/student/Announcements';
+import Settings from './pages/student/Settings';
+import Support from './pages/student/Support';
+import Assignments from './pages/student/Assignments';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import AdminUsers from './pages/admin/AdminUsers';
 import AdminCourses from './pages/admin/AdminCourses';
@@ -33,14 +33,15 @@ import AdminAnnouncements from './pages/admin/AdminAnnouncements';
 import AdminSettings from './pages/admin/AdminSettings';
 import FacultyPlaceholder from './pages/admin/FacultyPlaceholder';
 import { getDefaultRouteForRole } from './data/authMockData';
+import { getAuthValue, isAuthenticated } from './utils/authStorage';
 
-const getUserRole = () => localStorage.getItem('userRole') || 'student';
+const getUserRole = () => getAuthValue('userRole') || 'student';
 
 const RoleRoute = ({ children, allowedRoles }) => {
-  const isAuthenticated = localStorage.getItem('authToken');
+  const hasAuthSession = isAuthenticated();
   const role = getUserRole();
 
-  if (!isAuthenticated) {
+  if (!hasAuthSession) {
     return <Navigate to="/" replace />;
   }
 
@@ -52,8 +53,7 @@ const RoleRoute = ({ children, allowedRoles }) => {
 };
 
 const RootRedirect = () => {
-  const isAuthenticated = localStorage.getItem('authToken');
-  if (!isAuthenticated) return <Login />;
+  if (!isAuthenticated()) return <Login />;
   return <Navigate to={getDefaultRouteForRole(getUserRole())} replace />;
 };
 
@@ -100,3 +100,4 @@ function App() {
 }
 
 export default App;
+
