@@ -58,9 +58,11 @@ const buildInitialState = () => {
     {
       id: 'SEC001',
       department: 'Computer Science',
-      batch: '2024',
+      batch: '2023',
       semester: 4,
       sectionName: 'A',
+      totalSeats: 100,
+      filledSeats: 94,
     },
     {
       id: 'SEC002',
@@ -68,6 +70,8 @@ const buildInitialState = () => {
       batch: '2024',
       semester: 5,
       sectionName: 'A',
+      totalSeats: 100,
+      filledSeats: 100,
     },
     {
       id: 'SEC003',
@@ -75,6 +79,26 @@ const buildInitialState = () => {
       batch: '2024',
       semester: 5,
       sectionName: 'B',
+      totalSeats: 100,
+      filledSeats: 82,
+    },
+    {
+      id: 'SEC004',
+      department: 'Information Technology',
+      batch: '2024',
+      semester: 5,
+      sectionName: 'A',
+      totalSeats: 90,
+      filledSeats: 76,
+    },
+    {
+      id: 'SEC005',
+      department: 'Electronics & Communication',
+      batch: '2024',
+      semester: 5,
+      sectionName: 'A',
+      totalSeats: 120,
+      filledSeats: 108,
     },
   ];
 
@@ -139,10 +163,29 @@ const getStoredState = () => {
         seats: Number(course.seats ?? matchingInitialCourse?.seats ?? 0),
       };
     });
+    const normalizedSections = (parsed.sections || initialState.sections).map((section) => {
+      const matchingInitialSection = initialState.sections.find((item) => item.id === section.id);
+      const shouldFixLegacyCseBatch =
+        section.id === 'SEC001' &&
+        section.department === 'Computer Science' &&
+        Number(section.semester) === 4 &&
+        section.batch === '2024';
+
+      return {
+        ...matchingInitialSection,
+        ...section,
+        batch: shouldFixLegacyCseBatch
+          ? '2023'
+          : section.batch ?? matchingInitialSection?.batch ?? '',
+        totalSeats: Number(section.totalSeats ?? matchingInitialSection?.totalSeats ?? 0),
+        filledSeats: Number(section.filledSeats ?? matchingInitialSection?.filledSeats ?? 0),
+      };
+    });
     return {
       ...initialState,
       ...parsed,
       courses: normalizedCourses,
+      sections: normalizedSections,
     };
   } catch {
     return initialState;
@@ -199,7 +242,26 @@ export const AdminProvider = ({ children }) => {
   };
 
   const saveSection = (section) => {
-    const nextState = { ...state, sections: upsertById(state.sections, section) };
+    const nextState = {
+      ...state,
+      sections: upsertById(state.sections, {
+        ...section,
+        totalSeats: Number(section.totalSeats || 0),
+        filledSeats: Number(section.filledSeats || 0),
+      }),
+    };
+    persist(nextState);
+  };
+
+  const deleteSection = (sectionId) => {
+    const nextState = {
+      ...state,
+      sections: state.sections.filter((section) => section.id !== sectionId),
+      facultyAssignments: state.facultyAssignments.filter(
+        (assignment) => assignment.sectionId !== sectionId
+      ),
+      timetableEntries: state.timetableEntries.filter((entry) => entry.sectionId !== sectionId),
+    };
     persist(nextState);
   };
 
@@ -307,6 +369,7 @@ export const AdminProvider = ({ children }) => {
       deleteUser,
       saveCourse,
       saveSection,
+      deleteSection,
       saveFacultyAssignment,
       deleteFacultyAssignment,
       saveTimetableEntry,

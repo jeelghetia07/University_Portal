@@ -11,6 +11,7 @@ import {
 import { currentUser } from "../../data/mockData";
 import { useTheme } from "../../context/ThemeContext";
 import { AvatarWithFallback } from "../common/Avatar";
+import { clearAuthSession, getAuthValue } from "../../utils/authStorage";
 
 const Navbar = ({ toggleSidebar }) => {
   const [showNotifications, setShowNotifications] = useState(false);
@@ -35,19 +36,14 @@ const Navbar = ({ toggleSidebar }) => {
   ];
 
   const unreadCount = notifications.filter((n) => n.unread).length;
-  const userName = localStorage.getItem("userName") || currentUser.name;
-  const userEmail = localStorage.getItem("userEmail") || currentUser.email;
-  const userProfilePic = localStorage.getItem("userProfilePic") || currentUser.profilePic;
-  const userRole = localStorage.getItem("userRole") || "student";
+  const userName = getAuthValue("userName") || currentUser.name;
+  const userEmail = getAuthValue("userEmail") || currentUser.email;
+  const userProfilePic = getAuthValue("userProfilePic") || currentUser.profilePic;
+  const userRole = getAuthValue("userRole") || "student";
+  const userDepartment = getAuthValue("userDepartment") || currentUser.department;
 
   const handleLogout = () => {
-    localStorage.removeItem("authToken");
-    localStorage.removeItem("userEmail");
-    localStorage.removeItem("userRole");
-    localStorage.removeItem("userName");
-    localStorage.removeItem("userDepartment");
-    localStorage.removeItem("userProfilePic");
-    localStorage.removeItem("userRollNumber");
+    clearAuthSession();
     setRole("student");
     navigate("/");
   };
@@ -143,8 +139,7 @@ const Navbar = ({ toggleSidebar }) => {
                     {userName}
                   </p>
                   <p className="text-xs text-slate-500 dark:text-slate-400">
-                    {localStorage.getItem("userDepartment") ||
-                      currentUser.department}
+                    {userDepartment}
                   </p>
                 </div>
                 <ChevronDown className="w-4 h-4 text-slate-400 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors" />

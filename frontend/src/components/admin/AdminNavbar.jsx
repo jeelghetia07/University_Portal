@@ -3,24 +3,19 @@ import { Menu, Bell, LogOut, ChevronDown, Settings } from 'lucide-react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useTheme } from '../../context/ThemeContext';
 import { AvatarWithFallback } from '../common/Avatar';
+import { clearAuthSession, getAuthValue } from '../../utils/authStorage';
 
 const AdminNavbar = ({ toggleSidebar }) => {
   const [openProfile, setOpenProfile] = useState(false);
   const { setRole } = useTheme();
   const navigate = useNavigate();
 
-  const adminName = localStorage.getItem('userName') || 'Admin';
-  const adminEmail = localStorage.getItem('userEmail') || 'admin@university.edu';
-  const adminAvatar = localStorage.getItem('userProfilePic') || '';
+  const adminName = getAuthValue('userName') || 'Admin';
+  const adminEmail = getAuthValue('userEmail') || 'admin@university.edu';
+  const adminAvatar = getAuthValue('userProfilePic') || '';
 
   const handleLogout = () => {
-    localStorage.removeItem('authToken');
-    localStorage.removeItem('userEmail');
-    localStorage.removeItem('userRole');
-    localStorage.removeItem('userName');
-    localStorage.removeItem('userDepartment');
-    localStorage.removeItem('userProfilePic');
-    localStorage.removeItem('userRollNumber');
+    clearAuthSession();
     setRole('student');
     navigate('/');
   };
