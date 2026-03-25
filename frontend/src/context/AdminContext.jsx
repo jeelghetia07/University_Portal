@@ -14,6 +14,12 @@ import {
 const ADMIN_STORAGE_KEY = 'adminPrototypeState';
 const AdminContext = createContext(null);
 
+const getBatchFromUser = (user) => {
+  if (user.role !== 'student' || !user.id) return null;
+  const admissionYear = user.id.slice(0, 2);
+  return /^\d{2}$/.test(admissionYear) ? `20${admissionYear}` : null;
+};
+
 const buildInitialState = () => {
   const users = [
     {
@@ -32,6 +38,7 @@ const buildInitialState = () => {
       email: currentUser.email,
       role: 'student',
       department: currentUser.department,
+      batch: `${currentUser.enrollmentYear}`,
       semester: currentUser.semester,
       section: 'A',
       status: 'active',
@@ -42,6 +49,7 @@ const buildInitialState = () => {
       email: faculty.email,
       role: 'faculty',
       department: faculty.department,
+      batch: '-',
       semester: '-',
       section: '-',
       status: 'active',
@@ -58,7 +66,7 @@ const buildInitialState = () => {
     {
       id: 'SEC001',
       department: 'Computer Science',
-      batch: '2023',
+      batch: '2024',
       semester: 4,
       sectionName: 'A',
       totalSeats: 100,
@@ -67,7 +75,7 @@ const buildInitialState = () => {
     {
       id: 'SEC002',
       department: 'Computer Science',
-      batch: '2024',
+      batch: '2023',
       semester: 5,
       sectionName: 'A',
       totalSeats: 100,
@@ -76,7 +84,7 @@ const buildInitialState = () => {
     {
       id: 'SEC003',
       department: 'Computer Science',
-      batch: '2024',
+      batch: '2023',
       semester: 5,
       sectionName: 'B',
       totalSeats: 100,
@@ -165,18 +173,23 @@ const getStoredState = () => {
     });
     const normalizedSections = (parsed.sections || initialState.sections).map((section) => {
       const matchingInitialSection = initialState.sections.find((item) => item.id === section.id);
-      const shouldFixLegacyCseBatch =
+      const shouldFixSem4CseBatch =
         section.id === 'SEC001' &&
         section.department === 'Computer Science' &&
-        Number(section.semester) === 4 &&
-        section.batch === '2024';
+        Number(section.semester) === 4;
+      const shouldFixSem5CseBatch =
+        (section.id === 'SEC002' || section.id === 'SEC003') &&
+        section.department === 'Computer Science' &&
+        Number(section.semester) === 5;
 
       return {
         ...matchingInitialSection,
         ...section,
-        batch: shouldFixLegacyCseBatch
-          ? '2023'
-          : section.batch ?? matchingInitialSection?.batch ?? '',
+        batch: shouldFixSem4CseBatch
+          ? '2024'
+          : shouldFixSem5CseBatch
+            ? '2023'
+            : section.batch ?? matchingInitialSection?.batch ?? '',
         totalSeats: Number(section.totalSeats ?? matchingInitialSection?.totalSeats ?? 0),
         filledSeats: Number(section.filledSeats ?? matchingInitialSection?.filledSeats ?? 0),
       };
@@ -206,7 +219,16 @@ export const AdminProvider = ({ children }) => {
       : [record, ...collection];
 
   const saveUser = (user) => {
-    const nextState = { ...state, users: upsertById(state.users, user) };
+    const nextState = {
+      ...state,
+      users: upsertById(state.users, {
+        ...user,
+        batch:
+          user.role === 'student'
+            ? user.batch || getBatchFromUser(user) || ''
+            : '-',
+      }),
+    };
     persist(nextState);
   };
 
@@ -263,6 +285,123 @@ export const AdminProvider = ({ children }) => {
       timetableEntries: state.timetableEntries.filter((entry) => entry.sectionId !== sectionId),
     };
     persist(nextState);
+  };
+
+  const promoteBatch = (department, batch) => {
+    const batchSections = state.sections.filter(
+      (section) => section.department === department && section.batch === batch
+    );
+
+    if (!batchSections.length) {
+      return { success: false, message: 'No sections found for this batch.' };
+    }
+
+    const currentSemester = Math.max(...batchSections.map((section) => Number(section.semester || 0)));
+    if (currentSemester >= 8) {
+      return { success: false, message: 'This batch is already in the final semester.' };
+    }
+
+    const promotedSectionIds = batchSections.map((section) => section.id);
+    const nextState = {
+      ...state,
+      sections: state.sections.map((section) =>
+        section.department === department && section.batch === batch
+          ? { ...section, semester: Number(section.semester) + 1 }
+          : section
+      ),
+      users: state.users.map((user) => {
+        const userBatch = user.batch || getBatchFromUser(user);
+        return user.role === 'student' &&
+          user.department === department &&
+          userBatch === batch &&
+          Number(user.semester) === currentSemester
+          ? { ...user, batch, semester: String(Number(user.semester) + 1) }
+          : user;
+      }),
+      facultyAssignments: state.facultyAssignments.filter(
+        (assignment) => !promotedSectionIds.includes(assignment.sectionId)
+      ),
+      timetableEntries: state.timetableEntries.filter(
+        (entry) => !promotedSectionIds.includes(entry.sectionId)
+      ),
+    };
+
+    persist(nextState);
+    return {
+      success: true,
+      message: `${department} Batch ${batch} promoted from Semester ${currentSemester} to Semester ${currentSemester + 1}. Faculty allocations and timetable were cleared for reconfiguration.`,
+    };
+  };
+
+  const promoteBranch = (department) => {
+    const branchSections = state.sections.filter((section) => section.department === department);
+    const batches = [...new Set(branchSections.map((section) => section.batch))];
+
+    if (!batches.length) {
+      return { success: false, message: 'No batches found for this branch.' };
+    }
+
+    const failures = [];
+    batches.forEach((batch) => {
+      const batchSectionsForSemester = state.sections.filter(
+        (section) => section.department === department && section.batch === batch
+      );
+      const currentSemester = Math.max(
+        ...batchSectionsForSemester.map((section) => Number(section.semester || 0))
+      );
+      if (currentSemester >= 8) {
+        failures.push(batch);
+      }
+    });
+
+    if (failures.length === batches.length) {
+      return { success: false, message: 'All batches in this branch are already in the final semester.' };
+    }
+
+    let workingState = state;
+    batches.forEach((batch) => {
+      const batchSectionsForSemester = workingState.sections.filter(
+        (section) => section.department === department && section.batch === batch
+      );
+      const currentSemester = Math.max(
+        ...batchSectionsForSemester.map((section) => Number(section.semester || 0))
+      );
+      if (currentSemester >= 8) return;
+
+      const promotedSectionIds = batchSectionsForSemester.map((section) => section.id);
+      workingState = {
+        ...workingState,
+        sections: workingState.sections.map((section) =>
+          section.department === department && section.batch === batch
+            ? { ...section, semester: Number(section.semester) + 1 }
+            : section
+        ),
+        users: workingState.users.map((user) => {
+          const userBatch = user.batch || getBatchFromUser(user);
+          return user.role === 'student' &&
+            user.department === department &&
+            userBatch === batch &&
+            Number(user.semester) === currentSemester
+            ? { ...user, batch, semester: String(Number(user.semester) + 1) }
+            : user;
+        }),
+        facultyAssignments: workingState.facultyAssignments.filter(
+          (assignment) => !promotedSectionIds.includes(assignment.sectionId)
+        ),
+        timetableEntries: workingState.timetableEntries.filter(
+          (entry) => !promotedSectionIds.includes(entry.sectionId)
+        ),
+      };
+    });
+
+    persist(workingState);
+    return {
+      success: true,
+      message:
+        failures.length > 0
+          ? `${department} branch promoted where possible. Final-semester batches were skipped: ${failures.join(', ')}.`
+          : `${department} branch promoted to the next semester. Faculty allocations and timetable were cleared for reconfiguration.`,
+    };
   };
 
   const saveFacultyAssignment = (assignment) => {
@@ -370,6 +509,8 @@ export const AdminProvider = ({ children }) => {
       saveCourse,
       saveSection,
       deleteSection,
+      promoteBatch,
+      promoteBranch,
       saveFacultyAssignment,
       deleteFacultyAssignment,
       saveTimetableEntry,
