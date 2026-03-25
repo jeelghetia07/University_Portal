@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { Building2, Layers3, Pencil, Plus, Trash2, Users } from 'lucide-react';
+import { ArrowUpCircle, Building2, Layers3, Pencil, Plus, Trash2, Users } from 'lucide-react';
 import { useAdmin } from '../../context/AdminContext';
 import AdminPageHeader from '../../components/admin/AdminPageHeader';
 
@@ -14,12 +14,13 @@ const emptySection = {
 };
 
 const AdminSections = () => {
-  const { sections, saveSection, deleteSection } = useAdmin();
+  const { sections, saveSection, deleteSection, promoteBatch, promoteBranch } = useAdmin();
   const [showModal, setShowModal] = useState(false);
   const [formData, setFormData] = useState(emptySection);
   const [openBranch, setOpenBranch] = useState(() => sections[0]?.department || '');
   const [branchFilters, setBranchFilters] = useState({});
   const [formError, setFormError] = useState('');
+  const [promotionMessage, setPromotionMessage] = useState('');
 
   const branches = useMemo(() => {
     const grouped = sections.reduce((accumulator, section) => {
@@ -133,6 +134,24 @@ const AdminSections = () => {
     batchSections.forEach((section) => deleteSection(section.id));
   };
 
+  const handlePromoteBatch = (department, batch) => {
+    const confirmed = window.confirm(
+      `Promote ${department} Batch ${batch} to the next semester? This will clear faculty allocations and timetable entries for that batch.`
+    );
+    if (!confirmed) return;
+    const result = promoteBatch(department, batch);
+    setPromotionMessage(result.message);
+  };
+
+  const handlePromoteBranch = (department) => {
+    const confirmed = window.confirm(
+      `Promote all batches in ${department} to the next semester where possible? This will clear faculty allocations and timetable entries for promoted batches.`
+    );
+    if (!confirmed) return;
+    const result = promoteBranch(department);
+    setPromotionMessage(result.message);
+  };
+
   return (
     <div className="space-y-6">
       <AdminPageHeader
@@ -145,6 +164,12 @@ const AdminSections = () => {
           </button>
         }
       />
+
+      {promotionMessage && (
+        <div className="rounded-xl border border-emerald-200 dark:border-emerald-900/40 bg-emerald-50 dark:bg-emerald-950/20 px-4 py-3 text-sm text-emerald-700 dark:text-emerald-300">
+          {promotionMessage}
+        </div>
+      )}
 
       <div className="space-y-5">
         {branches.map((branch) => {
@@ -194,6 +219,17 @@ const AdminSections = () => {
                   <span className="px-3 py-1 rounded-full bg-emerald-100 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-300 text-xs font-semibold">
                     Filled {branch.filledSeats}
                   </span>
+                  <button
+                    type="button"
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      handlePromoteBranch(branch.department);
+                    }}
+                    className="inline-flex items-center gap-2 px-3 py-2 rounded-lg border border-indigo-200 dark:border-indigo-900/40 text-indigo-700 dark:text-indigo-300 hover:bg-indigo-50 dark:hover:bg-indigo-950/20 transition-all text-sm font-medium"
+                  >
+                    <ArrowUpCircle className="w-4 h-4" />
+                    <span>Promote Branch</span>
+                  </button>
                 </div>
               </button>
 
@@ -318,6 +354,14 @@ const AdminSections = () => {
                               <span className="px-3 py-1 rounded-full bg-emerald-100 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-300 text-xs font-semibold">
                                 Filled {batchItem.filledSeats}
                               </span>
+                              <button
+                                type="button"
+                                onClick={() => handlePromoteBatch(branch.department, batchItem.batch)}
+                                className="inline-flex items-center gap-2 px-3 py-2 rounded-lg border border-indigo-200 dark:border-indigo-900/40 text-indigo-700 dark:text-indigo-300 hover:bg-indigo-50 dark:hover:bg-indigo-950/20 transition-all text-sm font-medium"
+                              >
+                                <ArrowUpCircle className="w-4 h-4" />
+                                <span>Promote Batch</span>
+                              </button>
                               <button
                                 type="button"
                                 onClick={() =>
