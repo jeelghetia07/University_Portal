@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { Plus, Pencil, Power, Trash2, Users } from 'lucide-react';
+import { Plus, Pencil, Trash2, Users } from 'lucide-react';
 import { useAdmin } from '../../context/AdminContext';
 import AdminPageHeader from '../../components/admin/AdminPageHeader';
 
@@ -15,7 +15,7 @@ const emptyUser = {
 };
 
 const AdminUsers = () => {
-  const { users, saveUser, toggleUserStatus, deleteUser } = useAdmin();
+  const { users, saveUser, deleteUser } = useAdmin();
   const [selectedRole, setSelectedRole] = useState('all');
   const [selectedDepartment, setSelectedDepartment] = useState('all');
   const [editingUser, setEditingUser] = useState(null);
@@ -36,7 +36,7 @@ const AdminUsers = () => {
 
   const openModal = (user = null) => {
     setEditingUser(user);
-    setFormData(user || { ...emptyUser, id: `${Date.now()}` });
+    setFormData(user || emptyUser);
     setShowModal(true);
   };
 
@@ -48,8 +48,19 @@ const AdminUsers = () => {
 
   const handleSubmit = (event) => {
     event.preventDefault();
+    const normalizedId = formData.id.trim().toUpperCase();
+
+    if (formData.role === 'student' && !normalizedId) {
+      return;
+    }
+
+    const generatedId =
+      normalizedId ||
+      `${formData.role === 'faculty' ? 'FAC' : 'ADM'}${Date.now()}`;
+
     saveUser({
       ...formData,
+      id: editingUser?.id || generatedId,
       semester: formData.role === 'student' ? formData.semester : '-',
       section: formData.role === 'student' ? formData.section : '-',
     });
@@ -69,7 +80,7 @@ const AdminUsers = () => {
     <div className="space-y-6">
       <AdminPageHeader
         title="User Management"
-        description="Manage student and faculty records for the prototype admin portal."
+        description="Create official university user records. Students and faculty activate these accounts later from the login page."
         action={
           <button
             onClick={() => openModal()}
@@ -105,7 +116,7 @@ const AdminUsers = () => {
                 <th className="py-3 pr-4">Department</th>
                 <th className="py-3 pr-4">Semester</th>
                 <th className="py-3 pr-4">Section</th>
-                <th className="py-3 pr-4">Status</th>
+                <th className="py-3 pr-4">Account</th>
                 <th className="py-3 pr-4">Actions</th>
               </tr>
             </thead>
@@ -121,17 +132,14 @@ const AdminUsers = () => {
                   <td className="py-4 pr-4 text-slate-700 dark:text-slate-300">{user.semester}</td>
                   <td className="py-4 pr-4 text-slate-700 dark:text-slate-300">{user.section}</td>
                   <td className="py-4 pr-4">
-                    <span className={`px-3 py-1 rounded-full text-xs font-semibold ${user.status === 'active' ? 'bg-green-100 text-green-700 dark:bg-green-950/30 dark:text-green-300' : 'bg-slate-200 text-slate-700 dark:bg-slate-800 dark:text-slate-300'}`}>
-                      {user.status}
+                    <span className={`px-3 py-1 rounded-full text-xs font-semibold ${user.accountSetupComplete ? 'bg-indigo-100 text-indigo-700 dark:bg-indigo-950/30 dark:text-indigo-300' : 'bg-amber-100 text-amber-700 dark:bg-amber-950/30 dark:text-amber-300'}`}>
+                      {user.accountSetupComplete ? 'activated' : 'pending setup'}
                     </span>
                   </td>
                   <td className="py-4 pr-4">
                     <div className="flex items-center gap-2">
                       <button onClick={() => openModal(user)} className="p-2 rounded-lg border border-slate-300 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all">
                         <Pencil className="w-4 h-4 text-slate-600 dark:text-slate-300" />
-                      </button>
-                      <button onClick={() => toggleUserStatus(user.id)} className="p-2 rounded-lg border border-slate-300 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all">
-                        <Power className="w-4 h-4 text-slate-600 dark:text-slate-300" />
                       </button>
                       <button onClick={() => handleDeleteUser(user)} className="p-2 rounded-lg border border-slate-300 dark:border-slate-700 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all">
                         <Trash2 className="w-4 h-4 text-red-500" />
@@ -154,7 +162,7 @@ const AdminUsers = () => {
               </div>
               <div>
                 <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100">{editingUser ? 'Edit User' : 'Add User'}</h2>
-                <p className="text-sm text-slate-500 dark:text-slate-400">Mock CRUD for prototype admin controls.</p>
+                <p className="text-sm text-slate-500 dark:text-slate-400">Admin issues the official university identity here. Password and recovery email are set later by the user during activation.</p>
               </div>
             </div>
 
@@ -162,6 +170,7 @@ const AdminUsers = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <input value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} placeholder="Full name" className="px-4 py-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100" required />
                 <input value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} placeholder="Email" className="px-4 py-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100" required />
+                <input value={formData.id} onChange={(e) => setFormData({ ...formData, id: e.target.value.toUpperCase() })} placeholder={formData.role === 'student' ? 'Roll number, e.g. 24BCP001' : 'Optional staff/admin ID'} className="px-4 py-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100" required={formData.role === 'student'} />
                 <select value={formData.role} onChange={(e) => setFormData({ ...formData, role: e.target.value })} className="px-4 py-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100">
                   <option value="student">Student</option>
                   <option value="faculty">Faculty</option>
