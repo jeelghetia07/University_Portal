@@ -11,8 +11,10 @@ import {
   AlertCircle,
   CheckCircle,
 } from "lucide-react";
+import { useAdmin } from "../context/AdminContext";
 
 const Signup = () => {
+  const { activateUserAccount, findUserByEmail } = useAdmin();
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -41,9 +43,14 @@ const Signup = () => {
     e.preventDefault();
     setError("");
 
-    // Validation
     if (!formData.name || !formData.email || !formData.recoveryEmail || !formData.password || !formData.confirmPassword) {
       setError("Please fill in all required fields");
+      return;
+    }
+
+    const existingUser = findUserByEmail(formData.email);
+    if (!existingUser) {
+      setError("This university account does not exist yet. Ask admin to create your record first.");
       return;
     }
 
@@ -69,38 +76,27 @@ const Signup = () => {
 
     setLoading(true);
 
-    // Simulate signup (we'll connect to backend later)
     setTimeout(() => {
-      // Store signup info in localStorage
+      const activation = activateUserAccount({
+        email: formData.email,
+        password: formData.password,
+        recoveryEmail: formData.recoveryEmail,
+        name: formData.name,
+        id: formData.studentID,
+        department: formData.department,
+        semester: formData.semester,
+      });
+
+      if (!activation.success) {
+        setLoading(false);
+        setError(activation.message);
+        return;
+      }
+
       localStorage.setItem("signupEmail", formData.email);
       localStorage.setItem("signupRecoveryEmail", formData.recoveryEmail);
-      localStorage.setItem("signupPassword", formData.password);
       localStorage.setItem("signupName", formData.name);
       localStorage.setItem("justSignedUp", "true");
-
-      // Store department from student ID
-      const getDepartmentFromRollNumber = (rollNumber) => {
-        if (!rollNumber || rollNumber.length < 5)
-          return formData.department || "Computer Science";
-
-        const deptCode = rollNumber.substring(3, 5).toUpperCase();
-        const deptMap = {
-          CP: "Computer Science",
-          IT: "Information Technology",
-          EC: "Electronics & Communication",
-          CV: "Civil Engineering",
-          ME: "Mechanical Engineering",
-          EE: "Electrical Engineering",
-        };
-
-        return deptMap[deptCode] || formData.department || "Computer Science";
-      };
-
-      const detectedDepartment = getDepartmentFromRollNumber(
-        formData.studentID,
-      );
-      localStorage.setItem("signupDepartment", detectedDepartment);
-      localStorage.setItem("signupRollNumber", formData.studentID);
 
       setLoading(false);
       setSuccess(true);
@@ -120,7 +116,7 @@ const Signup = () => {
                   </svg>
                 </div>
                 <h1 style="color: #1f2937; font-size: 28px; font-weight: bold; margin-bottom: 10px;">Success!</h1>
-                <p style="color: #6b7280; margin-bottom: 30px; font-size: 16px;">Account created successfully! You can now close this tab and login.</p>
+                <p style="color: #6b7280; margin-bottom: 30px; font-size: 16px;">Account activated successfully! You can now close this tab and login.</p>
                 <button onclick="window.close()" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 12px 30px; border-radius: 10px; font-size: 16px; font-weight: 600; cursor: pointer; box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);">
                   Close This Tab
                 </button>
@@ -141,10 +137,10 @@ const Signup = () => {
             <CheckCircle className="w-12 h-12 text-green-600" />
           </div>
           <h2 className="text-3xl font-bold text-slate-900 mb-3">
-            Account Created!
+            Account Activated!
           </h2>
           <p className="text-slate-600 mb-6">
-            Your account has been successfully created. This tab will close
+            Your university account has been activated successfully. This tab will close
             automatically.
           </p>
           <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
@@ -177,17 +173,17 @@ const Signup = () => {
             <BookOpen className="w-8 h-8 text-indigo-600" />
           </div>
           <h1 className="text-4xl font-bold text-white mb-2">Join UniPortal</h1>
-          <p className="text-indigo-100">Create your student account</p>
+          <p className="text-indigo-100">Activate your university account</p>
         </div>
 
         {/* Signup Form */}
         <div className="bg-white rounded-2xl shadow-2xl p-8">
           <div className="mb-6">
             <h2 className="text-2xl font-bold text-slate-900">
-              Create Account
+              Activate Account
             </h2>
             <p className="text-slate-600 mt-1">
-              Fill in your details to get started
+              Admin creates your official account first. Use this page to set your password and recovery email.
             </p>
           </div>
 
@@ -223,7 +219,7 @@ const Signup = () => {
               {/* Email */}
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-2">
-                  Email Address <span className="text-red-500">*</span>
+                  University Email <span className="text-red-500">*</span>
                 </label>
                 <div className="relative">
                   <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400" />
@@ -232,7 +228,7 @@ const Signup = () => {
                     name="email"
                     value={formData.email}
                     onChange={handleChange}
-                    placeholder="2XXXXXXX@university.edu"
+                    placeholder="Enter your admin-issued university email."
                     className="w-full pl-10 pr-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all placeholder:text-slate-500 text-slate-900"
                   />
                 </div>
@@ -241,7 +237,7 @@ const Signup = () => {
               {/* Student ID */}
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-2">
-                  Student ID
+                  Roll Number
                 </label>
                 <div className="relative">
                   <Hash className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400" />
@@ -250,7 +246,7 @@ const Signup = () => {
                     name="studentID"
                     value={formData.studentID}
                     onChange={handleChange}
-                    placeholder="Enter your roll number."
+                    placeholder="Enter the roll number assigned by admin."
                     className="w-full pl-10 pr-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all placeholder:text-slate-500 text-slate-900"
                   />
                 </div>
@@ -305,7 +301,7 @@ const Signup = () => {
               {/* Semester */}
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-2">
-                  Semester
+                  Current Semester
                 </label>
                 <div className="relative">
                   <BookOpen className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400" />
@@ -421,10 +417,10 @@ const Signup = () => {
               {loading ? (
                 <span className="flex items-center justify-center space-x-2">
                   <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                  <span>Creating Account...</span>
-                </span>
-              ) : (
-                "Create Account"
+              <span>Activating Account...</span>
+              </span>
+            ) : (
+                "Activate Account"
               )}
             </button>
           </form>

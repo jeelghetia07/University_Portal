@@ -11,7 +11,8 @@ import {
 } from 'lucide-react';
 import PasswordResetModal from '../components/auth/PasswordResetModal';
 import { useTheme } from '../context/ThemeContext';
-import { findMockAuthUser, getDefaultRouteForRole } from '../data/authMockData';
+import { getDefaultRouteForRole } from '../data/authMockData';
+import { useAdmin } from '../context/AdminContext';
 import { persistAuthSession } from '../utils/authStorage';
 
 const Login = () => {
@@ -24,6 +25,7 @@ const Login = () => {
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const [showForgotPasswordModal, setShowForgotPasswordModal] = useState(false);
   const { setRole } = useTheme();
+  const { findUserByEmail } = useAdmin();
   const navigate = useNavigate();
 
   const syncSignupState = () => {
@@ -103,32 +105,29 @@ const Login = () => {
       return;
     }
 
-    const mockUser = findMockAuthUser(email);
-    const signupEmail = localStorage.getItem('signupEmail');
-    const signupPassword = localStorage.getItem('signupPassword');
-    const fallbackSignupUser =
-      signupEmail && signupEmail.toLowerCase() === email.toLowerCase()
-        ? {
-            id: localStorage.getItem('signupRollNumber') || email.split('@')[0].toUpperCase(),
-            name: localStorage.getItem('signupName') || email.split('@')[0].toUpperCase(),
-            email: signupEmail,
-            password: signupPassword || '',
-            role: 'student',
-            department: localStorage.getItem('signupDepartment') || 'Computer Science',
-            profilePic: '',
-          }
-        : null;
-    const userRecord = mockUser || fallbackSignupUser;
+    const userRecord = findUserByEmail(email);
 
     if (!userRecord) {
-      setError('No mock account found for this email');
+      setError('No university account was found for this email. Ask admin to create it first.');
       setLoading(false);
       return;
     }
 
     setTimeout(() => {
+      if (userRecord.status !== 'active') {
+        setError('This account is currently inactive. Contact admin.');
+        setLoading(false);
+        return;
+      }
+
+      if (!userRecord.accountSetupComplete || !userRecord.password) {
+        setError('This account is created by admin but not activated yet. Use Activate Account first.');
+        setLoading(false);
+        return;
+      }
+
       if (password !== userRecord.password) {
-        setError('Incorrect password for this mock account');
+        setError('Incorrect password');
         setLoading(false);
         return;
       }
@@ -196,8 +195,8 @@ const Login = () => {
                 <CheckCircle className="w-8 h-8 text-green-600" />
               </div>
               <div>
-                <h3 className="text-green-900 font-semibold text-lg">Account Created Successfully!</h3>
-                <p className="text-green-700 text-sm mt-1">You can now login with your credentials.</p>
+                <h3 className="text-green-900 font-semibold text-lg">Account Activated Successfully!</h3>
+                <p className="text-green-700 text-sm mt-1">You can now login with your university credentials.</p>
               </div>
             </div>
           </div>
@@ -208,7 +207,7 @@ const Login = () => {
             <h2 className="text-2xl font-bold text-slate-900">Welcome back!</h2>
             <p className="text-slate-600 mt-1">Please login to your account</p>
             <p className="text-xs text-slate-500 mt-2">
-              Demo accounts: `admin@university.edu`, `24BCP001@university.edu`, `anjali.mehta@university.edu`
+              Admin creates the university account first. Users activate it once, then login normally.
             </p>
           </div>
 
@@ -294,12 +293,12 @@ const Login = () => {
             </button>
           </form>
 
-          <div className="relative my-6">
+            <div className="relative my-6">
             <div className="absolute inset-0 flex items-center">
               <div className="w-full border-t border-slate-300"></div>
             </div>
             <div className="relative flex justify-center text-sm">
-              <span className="px-4 bg-white text-slate-500">Don't have an account?</span>
+              <span className="px-4 bg-white text-slate-500">First time using your admin-created account?</span>
             </div>
           </div>
 
@@ -308,7 +307,7 @@ const Login = () => {
             onClick={handleCreateAccount}
             className="w-full text-center py-3 border-2 border-indigo-600 text-indigo-600 rounded-lg font-semibold hover:bg-indigo-50 transition-all"
           >
-            Create Account
+            Activate Account
           </button>
         </div>
 
@@ -322,6 +321,7 @@ const Login = () => {
         onClose={closeForgotPasswordModal}
         successButtonLabel="Back to Login"
         forceLight
+        accountEmail={email}
       />
     </div>
   );
