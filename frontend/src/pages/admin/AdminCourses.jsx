@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Plus, Pencil, BookOpen } from 'lucide-react';
+import { Plus, Pencil, BookOpen, Trash2 } from 'lucide-react';
 import { useAdmin } from '../../context/AdminContext';
 import AdminPageHeader from '../../components/admin/AdminPageHeader';
 
@@ -15,7 +15,7 @@ const emptyCourse = {
 };
 
 const AdminCourses = () => {
-  const { courses, saveCourse } = useAdmin();
+  const { courses, saveCourse, deleteCourse } = useAdmin();
   const [showModal, setShowModal] = useState(false);
   const [formData, setFormData] = useState(emptyCourse);
   const [filters, setFilters] = useState({
@@ -68,6 +68,15 @@ const AdminCourses = () => {
       semester: Number(formData.semester),
     });
     closeModal();
+  };
+
+  const handleDeleteCourse = (course) => {
+    const shouldDelete = window.confirm(
+      `Delete ${course.courseCode} | ${course.courseName}? This will also remove linked faculty allocations and timetable entries in the current prototype.`
+    );
+
+    if (!shouldDelete) return;
+    deleteCourse(course.id);
   };
 
   return (
@@ -170,9 +179,14 @@ const AdminCourses = () => {
                 <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100">{course.courseName}</h2>
                 <p className="text-sm text-slate-500 dark:text-slate-400 mt-2">{course.department} | Semester {course.semester}</p>
               </div>
-              <button onClick={() => openModal(course)} className="p-2 rounded-lg border border-slate-300 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all">
-                <Pencil className="w-4 h-4 text-slate-600 dark:text-slate-300" />
-              </button>
+              <div className="flex items-center gap-2">
+                <button onClick={() => openModal(course)} className="p-2 rounded-lg border border-slate-300 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all">
+                  <Pencil className="w-4 h-4 text-slate-600 dark:text-slate-300" />
+                </button>
+                <button onClick={() => handleDeleteCourse(course)} className="p-2 rounded-lg border border-slate-300 dark:border-slate-700 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all">
+                  <Trash2 className="w-4 h-4 text-red-500" />
+                </button>
+              </div>
             </div>
           </div>
         ))}
