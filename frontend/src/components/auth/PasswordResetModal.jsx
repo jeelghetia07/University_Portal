@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
 import { AlertCircle, CheckCircle, Lock, X } from 'lucide-react';
+import { useAdmin } from '../../context/AdminContext';
+import { getAuthValue } from '../../utils/authStorage';
 
 const getInitialPasswordData = () => ({
   newPassword: '',
@@ -12,7 +14,9 @@ const PasswordResetModal = ({
   onSuccess,
   successButtonLabel = 'Done',
   forceLight = false,
+  accountEmail = '',
 }) => {
+  const { findUserByEmail, saveUser } = useAdmin();
   const [resetStep, setResetStep] = useState('request');
   const [resetOtp, setResetOtp] = useState('');
   const [generatedOtp, setGeneratedOtp] = useState('');
@@ -45,7 +49,11 @@ const PasswordResetModal = ({
     ? 'text-sm text-slate-600 mt-1'
     : 'text-sm text-slate-600 dark:text-slate-400 mt-1';
 
-  const recoveryEmail = localStorage.getItem('signupRecoveryEmail') || '';
+  const resolvedAccountEmail =
+    accountEmail || getAuthValue('userEmail') || localStorage.getItem('signupEmail') || '';
+  const matchedUser = resolvedAccountEmail ? findUserByEmail(resolvedAccountEmail) : null;
+  const recoveryEmail =
+    matchedUser?.recoveryEmail || localStorage.getItem('signupRecoveryEmail') || '';
 
   const maskEmail = (value) => {
     if (!value || !value.includes('@')) return value || 'Not available';
@@ -103,7 +111,13 @@ const PasswordResetModal = ({
       return;
     }
 
-    localStorage.setItem('mockResetPassword', resetPasswordData.newPassword);
+    if (matchedUser) {
+      saveUser({
+        ...matchedUser,
+        password: resetPasswordData.newPassword,
+      });
+    }
+
     setResetStep('success');
     if (onSuccess) {
       onSuccess(resetPasswordData.newPassword);
