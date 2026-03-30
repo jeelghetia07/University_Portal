@@ -1,4 +1,4 @@
-import { createContext, useContext, useMemo, useState } from 'react';
+import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import {
   announcements as baseAnnouncements,
   assignmentsData,
@@ -26,6 +26,9 @@ const buildInitialState = () => {
       id: 'ADM001',
       name: 'Aarav Shah',
       email: 'admin@university.edu',
+      password: '123456',
+      recoveryEmail: 'admin.recovery@example.com',
+      accountSetupComplete: true,
       role: 'admin',
       department: 'Administration',
       semester: '-',
@@ -36,6 +39,9 @@ const buildInitialState = () => {
       id: currentUser.id,
       name: currentUser.name,
       email: currentUser.email,
+      password: '123456',
+      recoveryEmail: 'student.recovery@example.com',
+      accountSetupComplete: true,
       role: 'student',
       department: currentUser.department,
       batch: `${currentUser.enrollmentYear}`,
@@ -47,6 +53,9 @@ const buildInitialState = () => {
       id: `FAC${String(index + 1).padStart(3, '0')}`,
       name: faculty.name,
       email: faculty.email,
+      password: '123456',
+      recoveryEmail: `faculty${index + 1}@example.com`,
+      accountSetupComplete: true,
       role: 'faculty',
       department: faculty.department,
       batch: '-',
@@ -162,6 +171,17 @@ const getStoredState = () => {
 
   try {
     const parsed = JSON.parse(stored);
+    const normalizedUsers = (parsed.users || initialState.users).map((user) => {
+      const matchingInitialUser = initialState.users.find((item) => item.id === user.id);
+      return {
+        ...matchingInitialUser,
+        ...user,
+        password: user.password ?? matchingInitialUser?.password ?? '',
+        recoveryEmail: user.recoveryEmail ?? matchingInitialUser?.recoveryEmail ?? '',
+        accountSetupComplete:
+          user.accountSetupComplete ?? matchingInitialUser?.accountSetupComplete ?? false,
+      };
+    });
     const normalizedCourses = (parsed.courses || initialState.courses).map((course) => {
       const matchingInitialCourse = initialState.courses.find((item) => item.id === course.id);
       return {
@@ -197,6 +217,7 @@ const getStoredState = () => {
     return {
       ...initialState,
       ...parsed,
+      users: normalizedUsers,
       courses: normalizedCourses,
       sections: normalizedSections,
     };
@@ -207,6 +228,26 @@ const getStoredState = () => {
 
 export const AdminProvider = ({ children }) => {
   const [state, setState] = useState(getStoredState);
+
+  useEffect(() => {
+    const syncFromStorage = () => {
+      setState(getStoredState());
+    };
+
+    const handleStorage = (event) => {
+      if (event.key === ADMIN_STORAGE_KEY) {
+        syncFromStorage();
+      }
+    };
+
+    window.addEventListener('storage', handleStorage);
+    window.addEventListener('focus', syncFromStorage);
+
+    return () => {
+      window.removeEventListener('storage', handleStorage);
+      window.removeEventListener('focus', syncFromStorage);
+    };
+  }, []);
 
   const persist = (nextState) => {
     setState(nextState);
@@ -219,10 +260,16 @@ export const AdminProvider = ({ children }) => {
       : [record, ...collection];
 
   const saveUser = (user) => {
+    const existingUser = state.users.find((item) => item.id === user.id);
     const nextState = {
       ...state,
       users: upsertById(state.users, {
+        ...existingUser,
         ...user,
+        password: user.password ?? existingUser?.password ?? '',
+        recoveryEmail: user.recoveryEmail ?? existingUser?.recoveryEmail ?? '',
+        accountSetupComplete:
+          user.accountSetupComplete ?? existingUser?.accountSetupComplete ?? false,
         batch:
           user.role === 'student'
             ? user.batch || getBatchFromUser(user) || ''
@@ -252,6 +299,89 @@ export const AdminProvider = ({ children }) => {
     persist(nextState);
   };
 
+  const findUserByEmail = (email) =>
+    state.users.find((user) => user.email.toLowerCase() === email.toLowerCase());
+
+  const activateUserAccount = ({
+    email,
+    password,
+    recoveryEmail,
+    name,
+    id,
+    department,
+    semester,
+  }) => {
+    const existingUser = findUserByEmail(email);
+
+    if (!existingUser) {
+      return {
+        success: false,
+        message: 'No university account was found for this email. Ask admin to create it first.',
+      };
+    }
+
+    if (existingUser.accountSetupComplete) {
+      return {
+        success: false,
+        message: 'This account is already activated. Please login instead.',
+      };
+    }
+
+    if (existingUser.role === 'student') {
+      if (id && existingUser.id && existingUser.id.toUpperCase() !== id.toUpperCase()) {
+        return {
+          success: false,
+          message: 'Roll number does not match the admin-created student record.',
+        };
+      }
+
+      if (
+        department &&
+        existingUser.department &&
+        existingUser.department !== department
+      ) {
+        return {
+          success: false,
+          message: 'Department does not match the admin-created student record.',
+        };
+      }
+
+      if (
+        semester &&
+        existingUser.semester &&
+        String(existingUser.semester) !== String(semester)
+      ) {
+        return {
+          success: false,
+          message: 'Semester does not match the admin-created student record.',
+        };
+      }
+    }
+
+    const nextState = {
+      ...state,
+      users: state.users.map((user) =>
+        user.email.toLowerCase() === email.toLowerCase()
+          ? {
+              ...user,
+              name: name || user.name,
+              password,
+              recoveryEmail,
+              accountSetupComplete: true,
+            }
+          : user
+      ),
+    };
+
+    persist(nextState);
+    return {
+      success: true,
+      user:
+        nextState.users.find((user) => user.email.toLowerCase() === email.toLowerCase()) ||
+        existingUser,
+    };
+  };
+
   const saveCourse = (course) => {
     const nextState = {
       ...state,
@@ -259,6 +389,18 @@ export const AdminProvider = ({ children }) => {
         ...course,
         courseType: course.courseType || 'core',
       }),
+    };
+    persist(nextState);
+  };
+
+  const deleteCourse = (courseId) => {
+    const nextState = {
+      ...state,
+      courses: state.courses.filter((course) => course.id !== courseId),
+      facultyAssignments: state.facultyAssignments.filter(
+        (assignment) => assignment.courseId !== courseId
+      ),
+      timetableEntries: state.timetableEntries.filter((entry) => entry.courseId !== courseId),
     };
     persist(nextState);
   };
@@ -504,9 +646,12 @@ export const AdminProvider = ({ children }) => {
       materialStats: courseMaterials,
       gradeStats: gradesData,
       saveUser,
+      findUserByEmail,
+      activateUserAccount,
       toggleUserStatus,
       deleteUser,
       saveCourse,
+      deleteCourse,
       saveSection,
       deleteSection,
       promoteBatch,
