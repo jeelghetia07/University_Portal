@@ -1,4 +1,4 @@
-# University Student Portal
+# University Portal
 
 A modern, responsive student portal built with React + Vite.
 
