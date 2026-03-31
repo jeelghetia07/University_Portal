@@ -7,7 +7,9 @@ import {
   currentUser,
   examSchedule as baseExamSchedule,
   facultyData,
+  feeData as baseFeeData,
   gradesData,
+  supportTickets as baseSupportTickets,
   timetable,
 } from '../data/mockData';
 
@@ -153,6 +155,37 @@ const buildInitialState = () => {
     ...exam,
   }));
 
+  const feeRecords = [
+    {
+      id: 'FEE001',
+      studentId: currentUser.id,
+      studentName: currentUser.name,
+      studentEmail: currentUser.email,
+      department: currentUser.department,
+      semester: currentUser.semester,
+      totalFee: baseFeeData.totalFee,
+      paidAmount: baseFeeData.paidAmount,
+      pendingAmount: baseFeeData.pendingAmount,
+      dueDate: baseFeeData.dueDate,
+      status: baseFeeData.status,
+      paymentHistory: baseFeeData.paymentHistory,
+      breakdown: baseFeeData.breakdown,
+    },
+  ];
+
+  const supportTickets = baseSupportTickets.map((ticket) => ({
+    ...ticket,
+    studentId: currentUser.id,
+    studentName: currentUser.name,
+    studentEmail: currentUser.email,
+  }));
+
+  const supportSettings = {
+    email: 'support@university.edu',
+    phone: '+91 1800 XXX XXXX',
+    officeHours: 'Mon - Fri: 9 AM - 5 PM',
+  };
+
   return {
     users,
     courses,
@@ -161,6 +194,9 @@ const buildInitialState = () => {
     timetableEntries,
     announcements,
     examSchedule,
+    feeRecords,
+    supportTickets,
+    supportSettings,
   };
 };
 
@@ -220,6 +256,9 @@ const getStoredState = () => {
       users: normalizedUsers,
       courses: normalizedCourses,
       sections: normalizedSections,
+      feeRecords: parsed.feeRecords || initialState.feeRecords,
+      supportTickets: parsed.supportTickets || initialState.supportTickets,
+      supportSettings: parsed.supportSettings || initialState.supportSettings,
     };
   } catch {
     return initialState;
@@ -639,6 +678,35 @@ export const AdminProvider = ({ children }) => {
     persist(nextState);
   };
 
+  const saveFeeRecord = (feeRecord) => {
+    const nextState = {
+      ...state,
+      feeRecords: upsertById(state.feeRecords, {
+        ...feeRecord,
+        totalFee: Number(feeRecord.totalFee || 0),
+        paidAmount: Number(feeRecord.paidAmount || 0),
+        pendingAmount: Number(feeRecord.pendingAmount || 0),
+      }),
+    };
+    persist(nextState);
+  };
+
+  const saveSupportTicket = (ticket) => {
+    const nextState = {
+      ...state,
+      supportTickets: upsertById(state.supportTickets, ticket),
+    };
+    persist(nextState);
+  };
+
+  const saveSupportSettings = (settings) => {
+    const nextState = {
+      ...state,
+      supportSettings: settings,
+    };
+    persist(nextState);
+  };
+
   const value = useMemo(
     () => ({
       ...state,
@@ -665,6 +733,9 @@ export const AdminProvider = ({ children }) => {
       toggleAnnouncementArchive,
       saveExam,
       deleteExam,
+      saveFeeRecord,
+      saveSupportTicket,
+      saveSupportSettings,
     }),
     [state]
   );

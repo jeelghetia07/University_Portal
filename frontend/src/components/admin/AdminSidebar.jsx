@@ -7,7 +7,9 @@ import {
   UserCog,
   CalendarDays,
   FileText,
+  CircleDollarSign,
   Megaphone,
+  Headphones,
   Settings,
   Shield,
   X,
@@ -21,6 +23,8 @@ const menuItems = [
   { name: 'Faculty Allocation', path: '/admin/faculty-allocation', icon: UserCog },
   { name: 'Timetable', path: '/admin/timetable', icon: CalendarDays },
   { name: 'Examinations', path: '/admin/exams', icon: FileText },
+  { name: 'Fees', path: '/admin/fees', icon: CircleDollarSign },
+  { name: 'Support', path: '/admin/support', icon: Headphones },
   { name: 'Announcements', path: '/admin/announcements', icon: Megaphone },
   { name: 'Settings', path: '/admin/settings', icon: Settings },
 ];

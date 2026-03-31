@@ -4,7 +4,7 @@ import { useAdmin } from '../../context/AdminContext';
 import AdminPageHeader from '../../components/admin/AdminPageHeader';
 
 const AdminDashboard = () => {
-  const { users, courses, sections, facultyAssignments, timetableEntries, announcements, materialStats } = useAdmin();
+  const { users, courses, sections, facultyAssignments, timetableEntries, announcements, materialStats, supportTickets, feeRecords } = useAdmin();
 
   const stats = [
     { label: 'Students', value: users.filter((user) => user.role === 'student').length, icon: Users, tone: 'indigo' },
@@ -17,6 +17,8 @@ const AdminDashboard = () => {
     { to: '/admin/users', label: 'Manage Users' },
     { to: '/admin/faculty-allocation', label: 'Allocate Faculty' },
     { to: '/admin/timetable', label: 'Update Timetable' },
+    { to: '/admin/fees', label: 'Review Fees' },
+    { to: '/admin/support', label: 'Handle Support' },
     { to: '/admin/announcements', label: 'Post Announcement' },
   ];
 
@@ -79,6 +81,14 @@ const AdminDashboard = () => {
             <div className="p-4 rounded-xl bg-indigo-50 dark:bg-indigo-950/20 border border-indigo-200 dark:border-indigo-900">
               <p className="text-sm text-indigo-700 dark:text-indigo-300">Pinned announcements</p>
               <p className="text-2xl font-bold text-indigo-900 dark:text-indigo-200 mt-1">{announcements.filter((item) => item.pinned && !item.archived).length}</p>
+            </div>
+            <div className="p-4 rounded-xl bg-rose-50 dark:bg-rose-950/20 border border-rose-200 dark:border-rose-900">
+              <p className="text-sm text-rose-700 dark:text-rose-300">Open support tickets</p>
+              <p className="text-2xl font-bold text-rose-900 dark:text-rose-200 mt-1">{supportTickets.filter((ticket) => ticket.status === 'Open').length}</p>
+            </div>
+            <div className="p-4 rounded-xl bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-900">
+              <p className="text-sm text-emerald-700 dark:text-emerald-300">Total fee pending</p>
+              <p className="text-2xl font-bold text-emerald-900 dark:text-emerald-200 mt-1">Rs {feeRecords.reduce((sum, record) => sum + Number(record.pendingAmount || 0), 0).toLocaleString()}</p>
             </div>
           </div>
         </div>
