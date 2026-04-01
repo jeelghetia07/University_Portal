@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { BookOpen, Download, FileText, File, X, Calendar, User, Search } from 'lucide-react';
-import { enrolledCourses, courseMaterials } from '../../data/mockData';
+import { enrolledCourses } from '../../data/mockData';
+import { useAdmin } from '../../context/AdminContext';
 
 const CourseMaterials = () => {
+  const { materialStats } = useAdmin();
   const location = useLocation();
   const [selectedCourse, setSelectedCourse] = useState(null);
   const [showMaterialsModal, setShowMaterialsModal] = useState(false);
@@ -60,11 +62,11 @@ const CourseMaterials = () => {
   );
 
   // Get materials for selected course
-  const materials = selectedCourse ? (courseMaterials[selectedCourse.courseCode] || []) : [];
+  const materials = selectedCourse ? (materialStats[selectedCourse.courseCode] || []) : [];
 
   // Calculate total materials across all enrolled courses
   const totalMaterials = enrolledCourses.reduce((total, course) => {
-    return total + (courseMaterials[course.courseCode]?.length || 0);
+    return total + (materialStats[course.courseCode]?.length || 0);
   }, 0);
 
   return (
@@ -147,7 +149,7 @@ const CourseMaterials = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredCourses.map(course => {
-            const materialsCount = courseMaterials[course.courseCode]?.length || 0;
+            const materialsCount = materialStats[course.courseCode]?.length || 0;
             
             return (
               <div

@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import {
   AlertCircle,
   Calendar,
@@ -9,10 +9,11 @@ import {
   Upload,
   X,
 } from 'lucide-react';
-import { assignmentsData } from '../../data/mockData';
+import { useAdmin } from '../../context/AdminContext';
 
 const Assignments = () => {
-  const [assignments, setAssignments] = useState(assignmentsData);
+  const { assignmentItems, saveAssignment } = useAdmin();
+  const [assignments, setAssignments] = useState(assignmentItems);
   const [selectedAssignment, setSelectedAssignment] = useState(null);
   const [showSubmissionModal, setShowSubmissionModal] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
@@ -25,6 +26,10 @@ const Assignments = () => {
 
     return { total, pending, submitted, overdue };
   }, [assignments]);
+
+  useEffect(() => {
+    setAssignments(assignmentItems);
+  }, [assignmentItems]);
 
   const getStatusClasses = (status) => {
     switch (status) {
@@ -72,22 +77,26 @@ const Assignments = () => {
       minute: '2-digit',
     });
 
-    setAssignments((current) =>
-      current.map((item) =>
-        item.id === selectedAssignment.id
-          ? {
-              ...item,
-              status: 'Submitted',
-              submission: {
-                fileName: selectedFile.name,
-                submittedAt,
-                marks: item.submission?.marks ?? null,
-                feedback: 'Submission received. Awaiting faculty review',
-              },
-            }
-          : item
-      )
+    const nextAssignments = assignments.map((item) =>
+      item.id === selectedAssignment.id
+        ? {
+            ...item,
+            status: 'Submitted',
+            submission: {
+              fileName: selectedFile.name,
+              submittedAt,
+              marks: item.submission?.marks ?? null,
+              feedback: 'Submission received. Awaiting faculty review',
+            },
+          }
+        : item
     );
+
+    setAssignments(nextAssignments);
+    const updatedAssignment = nextAssignments.find((item) => item.id === selectedAssignment.id);
+    if (updatedAssignment) {
+      saveAssignment(updatedAssignment);
+    }
 
     closeSubmissionModal();
     alert('Assignment submitted successfully! (Demo mode)');
