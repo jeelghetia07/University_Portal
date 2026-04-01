@@ -6,6 +6,7 @@ import {
 } from "react-router-dom";
 import Layout from "./components/layout/Layout";
 import AdminLayout from "./components/admin/AdminLayout";
+import FacultyLayout from "./components/faculty/FacultyLayout";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import Dashboard from "./pages/student/Dashboard";
@@ -33,7 +34,12 @@ import AdminFees from "./pages/admin/AdminFees";
 import AdminSupport from "./pages/admin/AdminSupport";
 import AdminAnnouncements from "./pages/admin/AdminAnnouncements";
 import AdminSettings from "./pages/admin/AdminSettings";
-import FacultyPlaceholder from "./pages/admin/FacultyPlaceholder";
+import FacultyOverview from "./pages/faculty/FacultyOverview";
+import FacultyCourses from "./pages/faculty/FacultyCourses";
+import FacultyMaterials from "./pages/faculty/FacultyMaterials";
+import FacultyAssignments from "./pages/faculty/FacultyAssignments";
+import FacultyTimetable from "./pages/faculty/FacultyTimetable";
+import FacultySettings from "./pages/faculty/FacultySettings";
 import { getDefaultRouteForRole } from "./data/authMockData";
 import { getAuthValue, isAuthenticated } from "./utils/authStorage";
 
@@ -74,9 +80,59 @@ function App() {
           path="/faculty/overview"
           element={
             <RoleRoute allowedRoles={["faculty"]}>
-              <AdminLayout>
-                <FacultyPlaceholder />
-              </AdminLayout>
+              <FacultyLayout>
+                <FacultyOverview />
+              </FacultyLayout>
+            </RoleRoute>
+          }
+        />
+        <Route
+          path="/faculty/courses"
+          element={
+            <RoleRoute allowedRoles={["faculty"]}>
+              <FacultyLayout>
+                <FacultyCourses />
+              </FacultyLayout>
+            </RoleRoute>
+          }
+        />
+        <Route
+          path="/faculty/materials"
+          element={
+            <RoleRoute allowedRoles={["faculty"]}>
+              <FacultyLayout>
+                <FacultyMaterials />
+              </FacultyLayout>
+            </RoleRoute>
+          }
+        />
+        <Route
+          path="/faculty/assignments"
+          element={
+            <RoleRoute allowedRoles={["faculty"]}>
+              <FacultyLayout>
+                <FacultyAssignments />
+              </FacultyLayout>
+            </RoleRoute>
+          }
+        />
+        <Route
+          path="/faculty/timetable"
+          element={
+            <RoleRoute allowedRoles={["faculty"]}>
+              <FacultyLayout>
+                <FacultyTimetable />
+              </FacultyLayout>
+            </RoleRoute>
+          }
+        />
+        <Route
+          path="/faculty/settings"
+          element={
+            <RoleRoute allowedRoles={["faculty"]}>
+              <FacultyLayout>
+                <FacultySettings />
+              </FacultyLayout>
             </RoleRoute>
           }
         />

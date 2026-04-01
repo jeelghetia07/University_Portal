@@ -186,6 +186,9 @@ const buildInitialState = () => {
     officeHours: 'Mon - Fri: 9 AM - 5 PM',
   };
 
+  const materialLibrary = courseMaterials;
+  const assignmentItems = assignmentsData;
+
   return {
     users,
     courses,
@@ -197,6 +200,8 @@ const buildInitialState = () => {
     feeRecords,
     supportTickets,
     supportSettings,
+    materialLibrary,
+    assignmentItems,
   };
 };
 
@@ -259,6 +264,8 @@ const getStoredState = () => {
       feeRecords: parsed.feeRecords || initialState.feeRecords,
       supportTickets: parsed.supportTickets || initialState.supportTickets,
       supportSettings: parsed.supportSettings || initialState.supportSettings,
+      materialLibrary: parsed.materialLibrary || initialState.materialLibrary,
+      assignmentItems: parsed.assignmentItems || initialState.assignmentItems,
     };
   } catch {
     return initialState;
@@ -707,11 +714,71 @@ export const AdminProvider = ({ children }) => {
     persist(nextState);
   };
 
+  const saveMaterial = (courseCode, material) => {
+    const existingMaterials = state.materialLibrary[courseCode] || [];
+    const nextMaterials = upsertById(existingMaterials, material);
+    const nextState = {
+      ...state,
+      materialLibrary: {
+        ...state.materialLibrary,
+        [courseCode]: nextMaterials,
+      },
+    };
+    persist(nextState);
+  };
+
+  const deleteMaterial = (courseCode, materialId) => {
+    const existingMaterials = state.materialLibrary[courseCode] || [];
+    const nextState = {
+      ...state,
+      materialLibrary: {
+        ...state.materialLibrary,
+        [courseCode]: existingMaterials.filter((material) => material.id !== materialId),
+      },
+    };
+    persist(nextState);
+  };
+
+  const saveAssignment = (assignment) => {
+    const nextState = {
+      ...state,
+      assignmentItems: upsertById(state.assignmentItems, assignment),
+    };
+    persist(nextState);
+  };
+
+  const deleteAssignment = (assignmentId) => {
+    const nextState = {
+      ...state,
+      assignmentItems: state.assignmentItems.filter((assignment) => assignment.id !== assignmentId),
+    };
+    persist(nextState);
+  };
+
+  const saveAssignmentReview = (assignmentId, submissionUpdate) => {
+    const nextState = {
+      ...state,
+      assignmentItems: state.assignmentItems.map((assignment) =>
+        assignment.id === assignmentId
+          ? {
+              ...assignment,
+              status: submissionUpdate.marks !== null ? 'Graded' : submissionUpdate.status || assignment.status,
+              submission: {
+                ...assignment.submission,
+                ...submissionUpdate,
+              },
+            }
+          : assignment
+      ),
+    };
+    persist(nextState);
+  };
+
   const value = useMemo(
     () => ({
       ...state,
-      assignmentStats: assignmentsData,
-      materialStats: courseMaterials,
+      assignmentStats: state.assignmentItems,
+      materialStats: state.materialLibrary,
       gradeStats: gradesData,
       saveUser,
       findUserByEmail,
@@ -736,6 +803,11 @@ export const AdminProvider = ({ children }) => {
       saveFeeRecord,
       saveSupportTicket,
       saveSupportSettings,
+      saveMaterial,
+      deleteMaterial,
+      saveAssignment,
+      deleteAssignment,
+      saveAssignmentReview,
     }),
     [state]
   );
